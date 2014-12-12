@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="passwordmaker-ng">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PasswordMaker ng</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.css">
+
+    <!-- PasswordMaker ng styles -->
+    <link href="css/passwordmaker-ng.css" rel="stylesheet">
+    <link href="css/sticky-footer.css" rel="stylesheet">
+
+    <script src="components/jquery/dist/jquery.js"></script>
+    <script src="components/angular/angular.js"></script>
+    <script src="components/angular-animate/angular-animate.js"></script>
+    <script src="components/angular-route/angular-route.js"></script>
+    <script src="components/angular-resource/angular-resource.js"></script>
+
+    <!-- PasswordMaker ng styles -->
+    <script src="js/app.js"></script>
+    <script src="js/angular-bootstrap/dropdown-toggle.js"></script>
+    <script src="js/angular-bootstrap/bindHtml.js"></script>
+    <script src="js/angular-bootstrap/position.js"></script>
+    <script src="js/angular-bootstrap/tooltip.js"></script>
+    <script src="components/passwordmakerjs/passwordmaker.min.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+<!-- Wrap all page content here -->
+<div id="wrap">
+  
+  <!-- Fixed navbar -->
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">PasswordMaker NG</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li class="dropdown-header">Nav header</li>
+              <li><a href="#">Separated link</a></li>
+              <li><a href="#">One more separated link</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+  
+  <!-- Begin page content -->
+  <div class="container">
+    <div class="page-header">
+      <h1>Online version</h1>
+    </div>
+    <div ng-controller="password-generator">
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="inputUrl" class="col-sm-3 control-label">Input URL</label>
+          <div class="col-sm-9">
+            <input id="inputUrl" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="masterPassword" class="col-sm-3 control-label">Master password</label>
+          <div class="col-sm-9">
+            <input id="masterPassword" type="password" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="useLeet" class="col-sm-3 control-label">Use l33t</label>
+          <div class="col-sm-9">
+            <select id="useLeet" class="form-control">
+              <option value="no">not at all</option>
+              <option value="before">before generating the password</option>
+              <option value="after">after generating the password</option>
+              <option value="twice">before and after generating the password</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="l33tLevel" class="col-sm-3 control-label">l33t level</label>
+          <div class="col-sm-9">
+            <select id="l33tLevel" class="form-control">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="hashAlgorithm" class="col-sm-3 control-label">Hash algorithm</label>
+          <div class="col-sm-9">
+            <select id="hashAlgorithm" class="form-control">
+              <option value="md5">MD5</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">URL components</label>
+          <div class="col-sm-9">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="urlComponents" value="protocol" /> Protocol
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="urlComponents" value="subdomain" /> Subdomain(s)
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="urlComponents" value="domain" /> Domain
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="urlComponents" value="details" /> Port, path, anchor, query parameters
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputText" class="col-sm-3 control-label">Using text</label>
+          <div class="col-sm-9">
+            <input id="inputText" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="passwordLength" class="col-sm-3 control-label">Length of generated password</label>
+          <div class="col-sm-9">
+            <input id="passwordLength" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="username" class="col-sm-3 control-label">Username</label>
+          <div class="col-sm-9">
+            <input id="username" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="modifier" class="col-sm-3 control-label">IModifier</label>
+          <div class="col-sm-9">
+            <input id="modifier" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="characters" class="col-sm-3 control-label">
+            Characters
+            <span class="glyphicon glyphicon-question-sign" tooltip-placement="right" tooltip="The characters field contains the list of characters used in generating this password"></span>
+          </label>
+          <div class="col-sm-9">
+            <select id="characters" class="form-control">
+              <option selected="selected">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&amp;*()_-+={}|[]\:";'&lt;&gt;?,./</option>
+              <option>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789</option>
+              <option>0123456789abcdef</option>
+              <option>0123456789</option>
+              <option>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz</option>
+              <option>`~!@#$%^&amp;*()_-+={}|[]\:";'&lt;&gt;?,./</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="passwordPrefix" class="col-sm-3 control-label">Password prefix</label>
+          <div class="col-sm-9">
+            <input id="passwordPrefix" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="passwordSuffix" class="col-sm-3 control-label">Password suffix</label>
+          <div class="col-sm-9">
+            <input id="passwordSuffix" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="generatedPassword" class="col-sm-3 control-label">Generated password</label>
+          <div class="col-sm-9">
+            <input id="generatedPassword" type="text" class="form-control" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="footer">
+  <div class="container">
+    <p class="text-muted credit">
+      Example sticky footer.
+    </p>
+  </div>
+</div>
+
+  </body>
+</html> 

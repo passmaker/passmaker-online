@@ -1,0 +1,83 @@
+<div class="alert alert-warning" role="alert">
+  You are working <strong>offline</strong>, this means the following configuration won't be saved!
+</div>
+<form name="configuration" class="form-horizontal" role="form">
+  <div class="panel panel-default">
+    <div class="panel-heading">Defaults</div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label for="hashAlgorithm" class="col-sm-3 control-label">Hash algorithm</label>
+        <div class="col-sm-9">
+          <select id="hashAlgorithm" class="form-control" ng-model="conf.hashAlgorithm">
+            <option value="md5">MD5</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="passwordLength" class="col-sm-3 control-label">Password length</label>
+        <div class="col-sm-9">
+          <input id="passwordLength" type="number" class="form-control" ng-model="conf.passwordLenght" min="0" integer />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="modifier" class="col-sm-3 control-label">Modifier</label>
+        <div class="col-sm-9">
+          <input id="modifier" type="text" class="form-control" ng-model="conf.modifier" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="characters" class="col-sm-3 control-label">Characters</label>
+        <div class="col-sm-9">
+          <input id="characters" type="text" class="form-control" ng-model="conf.characters" ng-required />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Exceptions</div>
+    <div class="panel-body">
+      <button class="btn btn-success pull-right" ng-click="addException()"><span class="glyphicon glyphicon-plus-sign"></span> Add exception</button>
+    </div>
+    <ul class="list-group">
+      <li class="list-group-item" ng-repeat="exception in conf.exceptions">
+        <div class="form-group">
+          <label for="exception-{{ $index }}" class="col-sm-3 control-label">Service</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+              <input id="exception-{{ $index }}" type="text" class="form-control" ng-model="conf.exceptions[$index].service" />
+              <span class="input-group-btn">
+                <button class="btn btn-danger" type="button" ng-click="removeException($index)">Remove</button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="passwordLength-{{ $index }}" class="col-sm-3 control-label">Password length</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox">
+              </span>
+              <input id="passwordLength-{{ $index }}" type="number" class="form-control" ng-model="conf.exceptions[$index].passwordLength" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="modifier-{{ $index }}" class="col-sm-3 control-label">Modifier</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox">
+              </span>
+              <input id="modifier-{{ $index }}" type="text" class="form-control" ng-model="conf.exceptions[$index].modifier" />
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="pull-right">
+    <button class="btn btn-default">Restore</button>
+    <button class="btn btn-primary" ng-click="saveConfiguration()">Save</button>
+  </div>
+</form>

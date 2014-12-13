@@ -1,13 +1,12 @@
 #!/bin/bash
 
-#WORK=$(mktemp -d --tmpdir passwordmaker-XXX)
-WORK=/tmp/passwordmaker-S7v
-OUTPUT=$(dirname $0)/app/components/passwordmaker/jspasswordmaker.js
+WORK=$(mktemp -d --tmpdir passwordmaker-XXX)
+OUTPUT=$(dirname $0)/app/components/passwordmaker/passwordmaker.js
+echo writing results to $OUTPUT
 
-#svn checkout svn://svn.code.sf.net/p/passwordmaker/svn/tags/javascript-html/2.5/scripts $WORK/svn
+svn checkout svn://svn.code.sf.net/p/passwordmaker/svn/tags/javascript-html/2.5/scripts $WORK/svn
 
 SCRIPTS="aes.js
-passwordmaker.js
 md4.js
 md5.js
 md5_v6.js
@@ -20,19 +19,13 @@ hashutils.js
 select.js
 bodyShow.js"
 
-cat > $OUTPUT << EOF
-var passwordmaker = function() {
-
-EOF
-
+mkdir $(dirname $OUTPUT)
+echo "" > $OUTPUT
 for i in $SCRIPTS ; do
  cat $WORK/svn/$i >> $OUTPUT
 done
 
-cat >> $OUTPUT << EOF
-
-}
-EOF
+rm -rf $WORK
 
 uglifyjs $OUTPUT -c \
   --comments /Copyright/ \

@@ -2,6 +2,7 @@ var sepawall = angular.module('sepawall', [
   'ngRoute',
   'ui.bootstrap.dropdown',
   'ui.bootstrap.tooltip',
+  'ui.bootstrap.modal',
   'googleApi'
 ]);
 
@@ -89,7 +90,7 @@ sepawall.controller('PasswordGenerator', function($scope) {
 
 });
 
-sepawall.controller('ConfigurationEditor', function($scope, configuration) {
+sepawall.controller('ConfigurationEditor', function($scope, $modal, configuration) {
 
   $scope.hashAlgorithms = ["sha256", "hmac-sha256", "hmac-sha256_fix", "sha1", "hmac-sha1", "md4", "hmac-md4", "md5", "md5_v6", "hmac-md5", "hmac-md5_v6", "rmd160", "mac-rmd160"];
 
@@ -106,6 +107,13 @@ sepawall.controller('ConfigurationEditor', function($scope, configuration) {
   $scope.removeException = function(i) {
     $scope.conf.exceptions.splice(i, 1);
   }
+
+  $scope.showConfiguration = function() {
+    var stringConf = JSON.stringify(configuration.get(), null, ' ');
+    $modal.open({
+      template: '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title">Configuration</h4></div><div class="modal-body"><pre>' + stringConf + '</pre></div>'
+    });
+  };
 
   $scope.saveConfiguration = function() {
     configuration.set($scope.conf);

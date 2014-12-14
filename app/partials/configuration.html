@@ -9,20 +9,14 @@
         <label for="hashAlgorithm" class="col-sm-3 control-label">Hash algorithm</label>
         <div class="col-sm-9">
           <select id="hashAlgorithm" class="form-control" ng-model="conf.hashAlgorithm">
-            <option value="md5">MD5</option>
+            <option value="{{ algorithm }}" ng-repeat="algorithm in hashAlgorithms">{{ algorithm }}</option>
           </select>
         </div>
       </div>
       <div class="form-group">
         <label for="passwordLength" class="col-sm-3 control-label">Password length</label>
         <div class="col-sm-9">
-          <input id="passwordLength" type="number" class="form-control" ng-model="conf.passwordLenght" min="0" integer />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="modifier" class="col-sm-3 control-label">Modifier</label>
-        <div class="col-sm-9">
-          <input id="modifier" type="text" class="form-control" ng-model="conf.modifier" />
+          <input id="passwordLength" type="number" class="form-control" ng-model="conf.passwordLength" min="0" integer />
         </div>
       </div>
       <div class="form-group">

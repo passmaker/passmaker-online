@@ -5,7 +5,7 @@ var sepawall = angular.module('sepawall', [
   'googleApi'
 ]);
 
-sepawall.run(['$location', '$rootScope', function($location, $rootScope) {
+sepawall.run(['$rootScope', function($rootScope) {
   $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
     if (current.hasOwnProperty('$$route')) {
       $rootScope.title = current.$$route.title;
@@ -38,6 +38,19 @@ sepawall.config(function(googleLoginProvider) {
     ]
   });
 
+});
+
+sepawall.factory('configuration', function() {
+  var confHolder = {
+    'hashAlgorithm': '',
+    'passwordLength': '',
+    'characters': '',
+    'exceptions': []
+  };
+  return {
+    get: function() { return confHolder; },
+    set: function(conf) { confHolder = conf; }
+  };
 });
 
 sepawall.controller('storage-management', function($scope, googleLogin) {
@@ -76,7 +89,11 @@ sepawall.controller('PasswordGenerator', function($scope) {
 
 });
 
-sepawall.controller('ConfigurationEditor', function($scope) {
+sepawall.controller('ConfigurationEditor', function($scope, configuration) {
+
+  $scope.hashAlgorithms = ["sha256", "hmac-sha256", "hmac-sha256_fix", "sha1", "hmac-sha1", "md4", "hmac-md4", "md5", "md5_v6", "hmac-md5", "hmac-md5_v6", "rmd160", "mac-rmd160"];
+
+  $scope.conf = configuration.get();
 
   $scope.addException = function() {
     $scope.conf.exceptions.push({
@@ -91,16 +108,9 @@ sepawall.controller('ConfigurationEditor', function($scope) {
   }
 
   $scope.saveConfiguration = function() {
-    console.log(JSON.stringify($scope.conf, null, ' '));
+    configuration.set($scope.conf);
+    console.log(JSON.stringify(configuration.get(), null, ' '));
   };
-
-  $scope.conf = {
-    'exceptions' : [ {
-      'service': 'facebook.com'
-    }, {
-      'service': 'likedin.com'
-    } ]
-  }
 
 });
 

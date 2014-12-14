@@ -3,16 +3,17 @@ var sepawall = angular.module('sepawall', [
   'ui.bootstrap.dropdown',
   'ui.bootstrap.tooltip',
   'ui.bootstrap.modal',
-  'googleApi'
+  'sepawall.services.google',
+  'sepawall.configuration'
 ]);
 
-sepawall.run(['$rootScope', function($rootScope) {
+sepawall.run(function($rootScope) {
   $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
     if (current.hasOwnProperty('$$route')) {
       $rootScope.title = current.$$route.title;
     }
   });
-}]);
+});
 
 sepawall.config(function($routeProvider) {
   $routeProvider
@@ -30,17 +31,6 @@ sepawall.config(function($routeProvider) {
     });
 });
 
-sepawall.config(function(googleLoginProvider) {
-
-  googleLoginProvider.configure({
-    clientId: '452858183186-vnq9jcgt1heeveppo8nrnsvn1sep0q15.apps.googleusercontent.com',
-    scopes: [
-      'https://www.googleapis.com/auth/drive.file'
-    ]
-  });
-
-});
-
 sepawall.factory('configuration', function() {
   var confHolder = {
     'hashAlgorithm': '',
@@ -50,15 +40,70 @@ sepawall.factory('configuration', function() {
   };
   return {
     get: function() { return confHolder; },
-    set: function(conf) { confHolder = conf; }
+    set: function(conf) { confHolder = conf; },
+    load: function(callback) {
+      var request = gapi.client.request({
+        'path': '/drive/v2/files',
+        'method': 'GET',
+        'params': {
+          'q': "properties has { key='sepawall-id' and value ='AZERTY-sepawall' and visibility='PRIVATE' }"
+        }
+      });
+      request.execute(callback);
+    },
+    save: function() {
+      var boundary = new Date().getTime();
+      var delimiter = '--' + boundary;
+      var metadata = {
+        'title' : 'sepawall.json',
+        'description' : 'Secure Password Wallet configuration file',
+        'properties' : [ {
+            'key': 'sepawall-id',
+            'value': 'AZERTY-sepawall',
+            'visibility': 'PRIVATE'
+          }
+        ]
+      };
+      var bodyParts = [
+        delimiter,
+        'Content-Type: application/json',
+        '',
+        angular.toJson(metadata, true),
+        delimiter,
+        'Content-Type: application/json',
+        '',
+        angular.toJson(confHolder, true),
+        delimiter + '--'
+      ];
+      var request = gapi.client.request({
+        'path': '/upload/drive/v2/files',
+        'method': 'POST',
+        'params': {
+          'uploadType': 'multipart',
+          'visibility': 'PRIVATE'
+        },
+        'headers': {
+          'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
+        },
+        'body': bodyParts.join('\r\n')
+      });
+      request.execute(function(file) {
+        console.log(file);
+      });
+    }
   };
 });
 
-sepawall.controller('storage-management', function($scope, googleLogin) {
+sepawall.controller('CloudLogin', function($scope, googleService) {
+
+  $scope.ready = false;
+  var handleLoginSuccess = function(data) {
+    $scope.ready = true;
+  };
 
   $scope.login = function() {
-    googleLogin.login();
-  }
+    googleService.login().then(handleLoginSuccess);
+  };
 
 });
 
@@ -97,6 +142,7 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, configuratio
   $scope.conf = configuration.get();
 
   $scope.addException = function() {
+    $scope.conf.exceptions = $scope.conf.exceptions || [];
     $scope.conf.exceptions.push({
       'service': 'New service name',
       'passwordLength': '',
@@ -108,8 +154,14 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, configuratio
     $scope.conf.exceptions.splice(i, 1);
   }
 
+  $scope.restoreConfiguration = function() {
+    configuration.load(function(loadedConf) {
+      $scope.conf = loadedConf;
+    });
+  };
+
   $scope.showConfiguration = function() {
-    var stringConf = JSON.stringify(configuration.get(), null, ' ');
+    var stringConf = angular.toJson(configuration.get(), true);
     $modal.open({
       template: '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title">Configuration</h4></div><div class="modal-body"><pre>' + stringConf + '</pre></div>'
     });
@@ -117,7 +169,8 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, configuratio
 
   $scope.saveConfiguration = function() {
     configuration.set($scope.conf);
-    console.log(JSON.stringify(configuration.get(), null, ' '));
+    configuration.save();
+    console.log(angular.toJson(configuration.get(), true));
   };
 
 });
@@ -129,18 +182,7 @@ sepawall.controller('configuration-manager', function($scope) {
   });
 
   $scope.create = function() {
-    var request = gapi.client.request({
-     'path': '/drive/v2/files',
-     'method': 'POST',
-     'body': {
-       "title" : "Meta File 1.json",
-       "mimeType" : "application/json",
-       "description" : "This is a test of creating a metafile"
-      }
-    });
-    request.execute(function(file) {
-      console.log(file);
-    });
+
   };
 
 });

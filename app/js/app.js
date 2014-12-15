@@ -37,13 +37,22 @@ sepawall.config(function($routeProvider) {
     });
 });
 
-sepawall.service('sepawallConf', function($q, gDrive, sepawallVersion) {
-
-  var confHolder = {
+sepawall.service('profile', function() {
+  return {
     'hashAlgorithm': '',
     'passwordLength': '',
     'characters': '',
     'exceptions': []
+  };
+});
+
+sepawall.service('sepawallConf', function($q, gDrive, profile, sepawallVersion) {
+
+  var update = function(newProfile) {
+    profile.hashAlgorithm = newProfile.hashAlgorithm;
+    profile.passwordLength = newProfile.passwordLength;
+    profile.characters = newProfile.characters;
+    profile.exceptions = newProfile.exceptions;
   };
 
   var findConfigurationFile = function() {
@@ -65,26 +74,18 @@ sepawall.service('sepawallConf', function($q, gDrive, sepawallVersion) {
     return deferred.promise;
   };
 
-  this.get = function() {
-    return confHolder;
-  };
-
-  this.set = function(conf) {
-    confHolder = conf;
-  };
-
   this.load = function() {
     console.log('Retrieving configuration from Google Drive storage');
     findConfigurationFile().then(function(fileMetadata) {
       gDrive.get(fileMetadata.id).success(function(content) {
-        confHolder = angular.fromJson(content);
+        update(angular.fromJson(content));
       });
     });
   };
 
   this.save = function() {
     var mime = 'application/json',
-        data = angular.toJson(confHolder),
+        data = angular.toJson(profile),
         metadata = {
           'title' : 'sepawall.json',
           'description' : 'Secure Password Wallet configuration file',
@@ -151,15 +152,15 @@ sepawall.controller('PasswordGenerator', function($scope) {
 
 });
 
-sepawall.controller('ConfigurationEditor', function($scope, $modal, sepawallConf) {
+sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sepawallConf) {
 
   $scope.hashAlgorithms = ["sha256", "hmac-sha256", "hmac-sha256_fix", "sha1", "hmac-sha1", "md4", "hmac-md4", "md5", "md5_v6", "hmac-md5", "hmac-md5_v6", "rmd160", "mac-rmd160"];
 
-  $scope.conf = sepawallConf.get();
+  $scope.profile = profile;
 
   $scope.addException = function() {
-    $scope.conf.exceptions = $scope.conf.exceptions || [];
-    $scope.conf.exceptions.push({
+    $scope.profile.exceptions = $scope.profile.exceptions || [];
+    $scope.profile.exceptions.push({
       'service': 'New service name',
       'passwordLength': '',
       'modifier': ''
@@ -167,7 +168,7 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, sepawallConf
   }
 
   $scope.removeException = function(i) {
-    $scope.conf.exceptions.splice(i, 1);
+    $scope.profile.exceptions.splice(i, 1);
   }
 
   $scope.restoreConfiguration = function() {
@@ -175,16 +176,14 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, sepawallConf
   };
 
   $scope.showConfiguration = function() {
-    var stringConf = angular.toJson(sepawallConf.get(), true);
+    var stringProfile = angular.toJson(profile, true);
     $modal.open({
-      template: '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title">Configuration</h4></div><div class="modal-body"><pre>' + stringConf + '</pre></div>'
+      template: '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title">Configuration</h4></div><div class="modal-body"><pre>' + stringProfile + '</pre></div>'
     });
   };
 
   $scope.saveConfiguration = function() {
-    sepawallConf.set($scope.conf);
     sepawallConf.save();
-    console.log(angular.toJson(sepawallConf.get(), true));
   };
 
 });

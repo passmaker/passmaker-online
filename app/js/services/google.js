@@ -68,26 +68,106 @@ angular.module('google.api', [])
       }
     };
   })
-  
+
   .config(function($httpProvider) {
     $httpProvider.interceptors.push('gAuthHttpInterceptor');
   })
 
   .service('gHttp', function($http) {
-    return function(command, params) {
-      return $http({
-        method: command.match(/^\w+/),
-        url: 'https://www.googleapis.com' + command.replace(/^\w+ \/?/, '/'),
-        params: params
-      });
+    this.req = function(command) {
+
+      var self = this;
+      var request = {
+        method: 'GET',
+        url: '',
+        headers: {},
+        params: {}
+      };
+      var multipartBoundary = new Date().getTime();// + '#SEPAWALL';
+      var parts = [];
+
+      if (command) {
+        request.method = String(command.match(/^\w+/));
+        request.url = 'https://www.googleapis.com' + command.replace(/^\w+ \/?/, '/');
+      }
+
+      this.method = function(method) {
+        request.method = method;
+        return self;
+      };
+
+      this.url = function(url) {
+        request.url = url;
+        return self;
+      };
+
+      this.header = function(name, value) {
+        request.headers[name] = value;
+        return self;
+      };
+
+      this.param = function(name, value) {
+        request.params[name] = value;
+        return self;
+      };
+
+      this.data = function(data) {
+        request.data = data;
+        parts = {};
+        return self;
+      };
+
+      this.multipart = function(mimeType, content) {
+        parts.push('--' + multipartBoundary);
+        parts.push('Content-Type: ' + mimeType);
+        parts.push('');
+        parts.push(content);
+        return self;
+      };
+
+
+      self.$http = function() {
+        if (parts.length > 0 ) {
+          self.header('Content-Type', 'multipart/related; boundary="' + multipartBoundary + '"');
+          self.param('uploadType', 'multipart');
+          parts.push('--' + multipartBoundary + '--');
+          request.data = parts.join('\r\n');
+        }
+        return $http(request);
+      };
+
+      return self;
     };
   })
 
   .service('gDrive', function(gHttp) {
 
+    this.get = function(fileId) {
+      return gHttp.req('GET /drive/v2/files/' + fileId)
+                  .param('alt', 'media')
+                  .param('updateViewedDate', true)
+                  .$http();
+    };
+
     this.find = function(query) {
-      return gHttp('GET /drive/v2/files', {
-        'q': query
-      });
+      var q = query instanceof Array ? query.join(' and ') : query
+      return gHttp.req('GET /drive/v2/files')
+                  .param('q', q)
+                  .$http();
+    };
+
+    this.create = function(mimeType, content, metadata) {
+      return gHttp.req('POST /upload/drive/v2/files')
+                  .multipart('application/json; charset=UTF-8', angular.toJson(metadata, true))
+                  .multipart(mimeType, content)
+                  .$http();
+    };
+
+    this.update = function(fileId, mimeType, content, newRevision) {
+      return gHttp.req('PUT /upload/drive/v2/files/' + fileId)
+                  .header('Content-Type', mimeType)
+                  .param('newRevision', newRevision)
+                  .data(content)
+                  .$http();
     };
   });

@@ -37,66 +37,69 @@ sepawall.config(function($routeProvider) {
     });
 });
 
-sepawall.factory('configuration', function() {
+sepawall.service('sepawallConf', function($q, gDrive, sepawallVersion) {
+
   var confHolder = {
     'hashAlgorithm': '',
     'passwordLength': '',
     'characters': '',
     'exceptions': []
   };
-  return {
-    get: function() { return confHolder; },
-    set: function(conf) { confHolder = conf; },
-    load: function(callback) {
-      var request = gapi.client.request({
-        'path': '/drive/v2/files',
-        'method': 'GET',
-        'params': {
-          'q': "properties has { key='sepawall-id' and value ='AZERTY-sepawall' and visibility='PRIVATE' }"
+
+  var findConfigurationFile = function() {
+    var query = "properties has { key='sepawall-version' and value ='" + sepawallVersion + "' and visibility='PRIVATE' }";
+    var deferred = $q.defer();
+    gDrive.find(query)
+      .success(function(response) {
+        if (response.items.length == 1) {
+          deferred.resolve(response.items[0]);
+        } else if (response.items.length > 1) {
+          deferred.reject('More than one sepawall configuration');
+        } else {
+          deferred.reject('No sepawall configuration');
         }
+      })
+      .error(function(response) {
+        deferred.reject('Error loading configuration');
       });
-      request.execute(callback);
-    },
-    save: function() {
-      var boundary = new Date().getTime();
-      var delimiter = '--' + boundary;
-      var metadata = {
-        'title' : 'sepawall.json',
-        'description' : 'Secure Password Wallet configuration file',
-        'properties' : [ {
-            'key': 'sepawall-id',
-            'value': 'AZERTY-sepawall',
-            'visibility': 'PRIVATE'
-          }
-        ]
-      };
-      var bodyParts = [
-        delimiter,
-        'Content-Type: application/json',
-        '',
-        angular.toJson(metadata, true),
-        delimiter,
-        'Content-Type: application/json',
-        '',
-        angular.toJson(confHolder, true),
-        delimiter + '--'
-      ];
-      var request = gapi.client.request({
-        'path': '/upload/drive/v2/files',
-        'method': 'POST',
-        'params': {
-          'uploadType': 'multipart',
-          'visibility': 'PRIVATE'
-        },
-        'headers': {
-          'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
-        },
-        'body': bodyParts.join('\r\n')
+    return deferred.promise;
+  };
+
+  this.get = function() {
+    return confHolder;
+  };
+
+  this.set = function(conf) {
+    confHolder = conf;
+  };
+
+  this.load = function() {
+    console.log('Retrieving configuration from Google Drive storage');
+    findConfigurationFile().then(function(fileMetadata) {
+      gDrive.get(fileMetadata.id).success(function(content) {
+        confHolder = angular.fromJson(content);
       });
-      request.execute(function(file) {
-        console.log(file);
-      });
-    }
+    });
+  };
+
+  this.save = function() {
+    var mime = 'application/json',
+        data = angular.toJson(confHolder),
+        metadata = {
+          'title' : 'sepawall.json',
+          'description' : 'Secure Password Wallet configuration file',
+          'properties' : [ {
+              'key': 'sepawall-version',
+              'value': 'v1',
+              'visibility': 'PRIVATE'
+            }
+          ]
+        };
+    findConfigurationFile().then(function(fileMetadata) {
+      gDrive.update(fileMetadata.id, mime, data);
+    }, function() {
+      gDrive.create(mime, data, metadata)
+    });
   };
 });
 
@@ -148,11 +151,11 @@ sepawall.controller('PasswordGenerator', function($scope) {
 
 });
 
-sepawall.controller('ConfigurationEditor', function($scope, $modal, configuration, gDrive) {
+sepawall.controller('ConfigurationEditor', function($scope, $modal, sepawallConf) {
 
   $scope.hashAlgorithms = ["sha256", "hmac-sha256", "hmac-sha256_fix", "sha1", "hmac-sha1", "md4", "hmac-md4", "md5", "md5_v6", "hmac-md5", "hmac-md5_v6", "rmd160", "mac-rmd160"];
 
-  $scope.conf = configuration.get();
+  $scope.conf = sepawallConf.get();
 
   $scope.addException = function() {
     $scope.conf.exceptions = $scope.conf.exceptions || [];
@@ -168,22 +171,20 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, configuratio
   }
 
   $scope.restoreConfiguration = function() {
-    gDrive.find("properties has { key='sepawall-id' and value ='AZERTY-sepawall' and visibility='PRIVATE' }").then(function(loadedConf) {
-      $scope.conf = loadedConf;
-    });
+    sepawallConf.load()
   };
 
   $scope.showConfiguration = function() {
-    var stringConf = angular.toJson(configuration.get(), true);
+    var stringConf = angular.toJson(sepawallConf.get(), true);
     $modal.open({
       template: '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title">Configuration</h4></div><div class="modal-body"><pre>' + stringConf + '</pre></div>'
     });
   };
 
   $scope.saveConfiguration = function() {
-    configuration.set($scope.conf);
-    configuration.save();
-    console.log(angular.toJson(configuration.get(), true));
+    sepawallConf.set($scope.conf);
+    sepawallConf.save();
+    console.log(angular.toJson(sepawallConf.get(), true));
   };
 
 });

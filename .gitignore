@@ -1,2 +1,4 @@
+.kateproject.d/
 app/components/
 node_modules/
+.kateproject

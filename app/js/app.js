@@ -3,8 +3,8 @@ var sepawall = angular.module('sepawall', [
   'ui.bootstrap.dropdown',
   'ui.bootstrap.tooltip',
   'ui.bootstrap.modal',
-  'sepawall.services.google',
-  'sepawall.configuration'
+  'sepawall.configuration',
+  'google.api'
 ]);
 
 sepawall.run(function($rootScope) {
@@ -26,8 +26,14 @@ sepawall.config(function($routeProvider) {
       title: 'Configuration editor',
       templateUrl: 'partials/configuration.html',
       controller: 'ConfigurationEditor'
-    }).otherwise({
-      redirectTo: '/generator'
+    })
+    .when('/test', {
+      title: 'test',
+      templateUrl: 'partials/test.html',
+      controller: 'test'
+    })
+    .otherwise({
+      redirectTo: '/test'
     });
 });
 
@@ -94,15 +100,22 @@ sepawall.factory('configuration', function() {
   };
 });
 
-sepawall.controller('CloudLogin', function($scope, googleService) {
+sepawall.controller('CloudLogin', function($scope, $http, gAuth) {
 
   $scope.ready = false;
-  var handleLoginSuccess = function(data) {
-    $scope.ready = true;
-  };
 
+  gAuth.check().then(function(authResult) {
+      console.log('Authentication check completed');
+      console.log(authResult);
+      $scope.ready = true;
+    }, function(authResult) {
+      console.log('Authentication check completed');
+      console.log(authResult);
+      $scope.ready = false;
+    });
+  
   $scope.login = function() {
-    googleService.login().then(handleLoginSuccess);
+    gAuth.login();
   };
 
 });
@@ -135,7 +148,7 @@ sepawall.controller('PasswordGenerator', function($scope) {
 
 });
 
-sepawall.controller('ConfigurationEditor', function($scope, $modal, configuration) {
+sepawall.controller('ConfigurationEditor', function($scope, $modal, configuration, gDrive) {
 
   $scope.hashAlgorithms = ["sha256", "hmac-sha256", "hmac-sha256_fix", "sha1", "hmac-sha1", "md4", "hmac-md4", "md5", "md5_v6", "hmac-md5", "hmac-md5_v6", "rmd160", "mac-rmd160"];
 
@@ -155,7 +168,7 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, configuratio
   }
 
   $scope.restoreConfiguration = function() {
-    configuration.load(function(loadedConf) {
+    gDrive.find("properties has { key='sepawall-id' and value ='AZERTY-sepawall' and visibility='PRIVATE' }").then(function(loadedConf) {
       $scope.conf = loadedConf;
     });
   };
@@ -175,14 +188,6 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, configuratio
 
 });
 
-sepawall.controller('configuration-manager', function($scope) {
-
-  $scope.$on("googleDrive:loaded", function() {
-    console.log('google drive api loaded');
-  });
-
-  $scope.create = function() {
-
-  };
+sepawall.controller('test', function($scope, gAuthService) {
 
 });

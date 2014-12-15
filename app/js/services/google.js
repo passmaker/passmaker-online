@@ -1,59 +1,93 @@
-(function () {
-    'use strict';
+angular.module('google.api', [])
 
-    angular.module('sepawall.services.google', [])
-        .service('googleService', ['$http', '$rootScope', '$q', 'googleClientConfiguration', function ($http, $rootScope, $q, googleClientConfiguration) {
-            var clientId = googleClientConfiguration.clientId,
-                scopes = googleClientConfiguration.scopes,
-                domain = googleClientConfiguration.domain,
-                deferred = $q.defer();
+  .service('gAuth', function($q, gAuthConfiguration) {
 
-            this.login = function () {
-                gapi.auth.authorize({
-                    client_id: clientId,
-                    scope: scopes,
-                    immediate: false
-                }, this.handleAuthResult);
+    var self = this;
+    self.token = {
+      secret: '',
+      expiration: Date.now()
+    };
 
-                return deferred.promise;
+    self.check = function() {
+      return authorize(true);
+    };
+
+    self.login = function() {
+      return authorize(false);
+    };
+
+    var authorize = function(immediate) {
+      var deferred = $q.defer();
+
+      // check token validity before invoking the gapi
+      if ('' != self.token.secret && self.token.expiration * 1000 > Date.now()) {
+        console.log('Token is valid until ' + self.token.expiration.toLocaleString());
+        deferred.resolve(self.token);
+      } else {
+        // the token must be refreshed
+        // 1. load 'gapi.auth' client
+        // 2. request authorization
+        // 3. handle result
+        console.log('Loading Google auth API');
+        // 1.
+        gapi.load('auth', function() {
+          var options = {
+            client_id: gAuthConfiguration.clientId,
+            scope: gAuthConfiguration.scopes,
+            immediate: immediate
+          };
+          // 2.
+          gapi.auth.authorize(options, function(authResult) {
+            console.log('Requesting new token');
+
+            self.token.secret = authResult.access_token;
+            self.token.expiration = new Date(authResult.expires_at * 1000);
+
+            // 3.
+            if (authResult && !authResult.error) {
+              console.log('Successfuly got new token valid until ' + self.token.expiration.toLocaleString());
+              deferred.resolve(self.token);
+            } else {
+              console.log('Failed to get new token');
+              deferred.reject(authResult);
             }
+          });
+        });
+      }
+      return deferred.promise;
+    };
+  })
 
-            this.handleClientLoad = function () {
-                gapi.auth.init(function () { });
-                window.setTimeout(checkAuth, 1);
-            };
+  .service('gAuthHttpInterceptor', function(gAuth) {
+    return {
+      'request': function(config) {
+        if (config.url.indexOf('https://www.googleapis.com/') == 0) {
+          config.headers['Authorization'] = 'Bearer ' + gAuth.token.secret
+        }
+        return config;
+      }
+    };
+  })
+  
+  .config(function($httpProvider) {
+    $httpProvider.interceptors.push('gAuthHttpInterceptor');
+  })
 
-            this.checkAuth = function() {
-                gapi.auth.authorize({
-                    client_id: clientId,
-                    scope: scopes,
-                    immediate: true
-                }, this.handleAuthResult);
-            };
+  .service('gHttp', function($http) {
+    return function(command, params) {
+      return $http({
+        method: command.match(/^\w+/),
+        url: 'https://www.googleapis.com' + command.replace(/^\w+ \/?/, '/'),
+        params: params
+      });
+    };
+  })
 
-            this.handleAuthResult = function(authResult) {
-                if (authResult && !authResult.error) {
-                    var data = {};
-                    gapi.client.load('oauth2', 'v2', function () {
-                        var request = gapi.client.oauth2.userinfo.get();
-                        request.execute(function (resp) {
-                            data.email = resp.email;
-                        });
-                    });
-                    deferred.resolve(data);
-                } else {
-                    deferred.reject('error');
-                }
-            };
+  .service('gDrive', function(gHttp) {
 
-            this.handleAuthClick = function(event) {
-                gapi.auth.authorize({
-                    client_id: clientId,
-                    scope: scopes,
-                    immediate: false
-                }, this.handleAuthResult);
-                return false;
-            };
-
-        }]);
-})();
+    this.find = function(query) {
+      return gHttp('GET /drive/v2/files', {
+        'q': query
+      });
+    };
+  });

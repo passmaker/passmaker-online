@@ -41,7 +41,7 @@
   <div class="form-group">
     <label for="characters" class="col-sm-3 control-label">
       Characters
-      <span class="glyphicon glyphicon-question-sign" tooltip-placement="right" tooltip="The characters field contains the list of characters used in generating this password"></span>
+      <span class="glyphicon glyphicon-question-sign" bs-tooltip="{title: 'The characters field contains the list of characters used in generating this password'}" data-placement="right"></span>
     </label>
     <div class="col-sm-9">
       <select id="characters" class="form-control" ng-model="characters" ng-change="generatePassword()">

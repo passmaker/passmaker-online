@@ -1,8 +1,9 @@
 var sepawall = angular.module('sepawall', [
   'ngRoute',
-  'ui.bootstrap.dropdown',
-  'ui.bootstrap.tooltip',
-  'ui.bootstrap.modal',
+  'mgcrea.ngStrap',
+  'mgcrea.ngStrap.navbar',
+  'mgcrea.ngStrap.tooltip',
+  'mgcrea.ngStrap.modal',
   'sepawall.configuration',
   'google.api'
 ]);
@@ -175,10 +176,13 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sep
     sepawallConf.load()
   };
 
+
   $scope.showConfiguration = function() {
     var stringProfile = angular.toJson(profile, true);
-    $modal.open({
-      template: '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title">Configuration</h4></div><div class="modal-body"><pre>' + stringProfile + '</pre></div>'
+    $modal({
+      title: 'Configuration',
+      content:'<pre>' + stringProfile + '</pre>',
+      html: true
     });
   };
 

@@ -19,19 +19,15 @@
     <script src="components/angular-animate/angular-animate.js"></script>
     <script src="components/angular-route/angular-route.js"></script>
     <script src="components/angular-resource/angular-resource.js"></script>
+    <script src="components/angular-animate/angular-animate.js"></script>
+    <script src="components/angular-strap/dist/angular-strap.min.js"></script>
+    <script src="components/angular-strap/dist/angular-strap.tpl.min.js"></script>
     <script src="components/passwordmaker/passwordmaker.js"></script>
 
     <!-- sepawall scripts -->
     <script src="js/app.js"></script>
     <script src="js/configuration.js"></script>
     <script src="js/services/google.js"></script>
-    <script src="js/angular-bootstrap/dropdown-toggle.js"></script>
-    <script src="js/angular-bootstrap/bindHtml.js"></script>
-    <script src="js/angular-bootstrap/position.js"></script>
-    <script src="js/angular-bootstrap/tooltip.js"></script>
-    <script src="js/angular-bootstrap/transition.js"></script>
-    <script src="js/angular-bootstrap/modal.js"></script>
-
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -45,7 +41,7 @@
 <div id="wrap">
   
   <!-- Fixed navbar -->
-  <div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar navbar-default navbar-fixed-top" bs-navbar>
     <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -57,10 +53,8 @@
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li><a href="#/generator">Password generator</a></li>
-          <li><a href="#/configuration">Configuration</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li data-match-route="/generator?"><a href="#/generator">Password generator</a></li>
+          <li data-match-route="/configuration?"><a href="#/configuration">Configuration</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
             <ul class="dropdown-menu">

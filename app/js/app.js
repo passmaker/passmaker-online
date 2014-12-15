@@ -84,7 +84,7 @@ sepawall.service('sepawallConf', function($q, gDrive, profile, sepawallVersion) 
   };
 
   this.save = function() {
-    var mime = 'application/json',
+    var mime = 'text/plain',
         data = angular.toJson(profile),
         metadata = {
           'title' : 'sepawall.json',
@@ -162,8 +162,8 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sep
     $scope.profile.exceptions = $scope.profile.exceptions || [];
     $scope.profile.exceptions.push({
       'service': 'New service name',
-      'passwordLength': '',
-      'modifier': ''
+      'passwordLength': { 'override': false, 'value': ''},
+      'modifier': { 'override': false, 'value': ''}
     });
   }
 
@@ -185,7 +185,6 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sep
   $scope.saveConfiguration = function() {
     sepawallConf.save();
   };
-
 });
 
 sepawall.controller('test', function($scope, gAuthService) {

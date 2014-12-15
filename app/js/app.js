@@ -34,7 +34,7 @@ sepawall.config(function($routeProvider) {
       controller: 'test'
     })
     .otherwise({
-      redirectTo: '/test'
+      redirectTo: '/generator'
     });
 });
 

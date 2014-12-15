@@ -105,7 +105,7 @@ sepawall.service('sepawallConf', function($q, gDrive, profile, sepawallVersion) 
   };
 });
 
-sepawall.controller('CloudLogin', function($scope, $http, gAuth) {
+sepawall.controller('CloudLogin', function($scope, $http, gAuth, sepawallConf) {
 
   $scope.ready = false;
 
@@ -113,6 +113,7 @@ sepawall.controller('CloudLogin', function($scope, $http, gAuth) {
       console.log('Authentication check completed');
       console.log(authResult);
       $scope.ready = true;
+      sepawallConf.load();
     }, function(authResult) {
       console.log('Authentication check completed');
       console.log(authResult);

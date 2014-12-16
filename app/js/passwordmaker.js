@@ -25,8 +25,12 @@ angular.module('passwordmaker', [])
 
     return function(profile, masterPassword, inputText, username) {
       var hash = factory[profile.hashAlgorithm],
+          mp = masterPassword ? masterPassword : '',
+          input = inputText ? inputText : '',
+          user = username ? username : '',
+          mod = profile.modifier ? profile.modifier : '',
           pLength = profile.passwordLength,
-          data = inputText + username + (profile.modifier ? profile.modifier : ''),
+          data = input + user + mod,
           chars = profile.characters;
 
       var password = '';

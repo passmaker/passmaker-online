@@ -5,8 +5,7 @@
       <div class="form-group">
         <label for="hashAlgorithm" class="col-sm-3 control-label">Hash algorithm</label>
         <div class="col-sm-9">
-          <select id="hashAlgorithm" class="form-control" ng-model="profile.hashAlgorithm">
-            <option value="{{ algorithm }}" ng-repeat="algorithm in hashAlgorithms">{{ algorithm }}</option>
+          <select id="hashAlgorithm" class="form-control" ng-model="profile.hashAlgorithm" ng-options="algorithm for algorithm in hashAlgorithms">
           </select>
         </div>
       </div>

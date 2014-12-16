@@ -163,11 +163,11 @@ angular.module('google.api', [])
                   .$http();
     };
 
-    this.update = function(fileId, mimeType, content, newRevision) {
+    this.update = function(fileId, mimeType, content, metadata, newRevision) {
       return gHttp.req('PUT /upload/drive/v2/files/' + fileId)
-                  .header('Content-Type', mimeType)
-                  .param('newRevision', newRevision)
-                  .data(content)
+                  .param('newRevision', newRevision ? true : false)
+                  .multipart('application/json; charset=UTF-8', angular.toJson(metadata, true))
+                  .multipart(mimeType, content)
                   .$http();
     };
   });

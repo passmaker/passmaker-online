@@ -4,8 +4,9 @@ var sepawall = angular.module('sepawall', [
   'mgcrea.ngStrap.navbar',
   'mgcrea.ngStrap.tooltip',
   'mgcrea.ngStrap.modal',
+  'google.api',
   'sepawall.configuration',
-  'google.api'
+  'passwordmaker'
 ]);
 
 sepawall.run(function($rootScope) {
@@ -86,7 +87,7 @@ sepawall.service('sepawallConf', function($q, gDrive, profile, sepawallVersion) 
 
   this.save = function() {
     var mime = 'text/plain',
-        data = angular.toJson(profile),
+        data = angular.toJson(profile, true),
         metadata = {
           'title' : 'sepawall.json',
           'description' : 'Secure Password Wallet configuration file',
@@ -98,7 +99,7 @@ sepawall.service('sepawallConf', function($q, gDrive, profile, sepawallVersion) 
           ]
         };
     findConfigurationFile().then(function(fileMetadata) {
-      gDrive.update(fileMetadata.id, mime, data);
+      gDrive.update(fileMetadata.id, mime, data, metadata);
     }, function() {
       gDrive.create(mime, data, metadata)
     });
@@ -126,37 +127,41 @@ sepawall.controller('CloudLogin', function($scope, $http, gAuth, sepawallConf) {
 
 });
 
-sepawall.controller('PasswordGenerator', function($scope) {
-
-  var makePassword = function(hashAlgorithm, key, data,  charset) {
-    return PasswordMaker_MD5.any_md5(key + data, charset)
+sepawall.service('profileManager', function(profile) {
+  this.getProfile = function(inputText) {
+    var p = {
+      custom: false,
+      hashAlgorithm: profile.hashAlgorithm,
+      characters: profile.characters,
+      passwordLength: profile.passwordLength
+    };
+    angular.forEach(profile.exceptions, function(exception) {
+      if (inputText && inputText == exception.service) {
+        p.custom = true;
+        if (exception.passwordLength.override == true) {
+          p.passwordLength = exception.passwordLength.value;
+        }
+        if (exception.modifier.override == true) {
+          p.modifier = exception.modifier.value;
+        }
+      };
+    });
+    return p;
   };
+});
+
+sepawall.controller('PasswordGenerator', function($scope, profileManager, pMaker) {
   
   $scope.generatePassword = function() {
-    console.log('begin password generation');
-    var password = "";
-    var count = 0;
-    while (password.length < $scope.passwordLength) {
-      console.log('count: ' + count);
-      var key = $scope.masterPassword;
-      if (count > 0) {
-        key += '\n' + count;
-      }
-      password += makePassword($scope.hashAlgorithm,
-                         key,
-                         $scope.inputText + $scope.username + $scope.modifier,
-                         $scope.characters);
-      count++;
-    }
-    console.log('end password generation');
-    $scope.generatedPassword = password.substring(0, $scope.passwordLength);
+    var p = profileManager.getProfile($scope.inputText);
+    $scope.customProfile = p.custom;
+    $scope.generatedPassword = pMaker(p, $scope.masterPassword, $scope.inputText, $scope.username);
   };
-
 });
 
 sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sepawallConf) {
 
-  $scope.hashAlgorithms = ["sha256", "hmac-sha256", "hmac-sha256_fix", "sha1", "hmac-sha1", "md4", "hmac-md4", "md5", "md5_v6", "hmac-md5", "hmac-md5_v6", "rmd160", "mac-rmd160"];
+  $scope.hashAlgorithms = ["sha1", "hmac-sha1", "sha256", "hmac-sha256", "rmd160", "hmac-rmd160"];
 
   $scope.profile = profile;
 

@@ -27,7 +27,17 @@
   <div class="panel panel-default">
     <div class="panel-heading">Exceptions</div>
     <div class="panel-body">
+      <div class="alert alert-info" role="alert">
+        <p>
+          <span class="glyphicon glyphicon-info-sign" style="font-size: 2em; margin: 0.2em"></span>
+          Exceptions allow per service configuration in order to comply to specific service security policy.
+        </p>
+      </div>
       <button class="btn btn-success pull-right" ng-click="addException()"><span class="glyphicon glyphicon-plus-sign"></span> Add exception</button>
+      <p>
+        You can modify the Password length to truncate the password.<br />
+        Use the modifier to change the generated password. You should use this typically when a service has been compromised. This is also useful to avoid a password with a special character not handled correctly by the service.
+      </p>
     </div>
     <ul class="list-group">
       <li class="list-group-item" ng-repeat="exception in profile.exceptions">

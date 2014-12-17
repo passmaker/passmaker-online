@@ -7,7 +7,7 @@
     <title ng-bind="'Secure Password Wallet - ' + title">Secure Password Wallet</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.css" />
 
     <!-- sepawall styles -->
     <link href="css/sepawall.css" rel="stylesheet">
@@ -20,6 +20,9 @@
     <script src="components/angular-resource/angular-resource.js"></script>
     <script src="components/angular-animate/angular-animate.js"></script>
     <script src="components/angular-ui-utils/ui-utils.min.js"></script>
+    <script src="components/ui-bootstrap/src/collapse/collapse.js"></script>
+    <script src="components/ui-bootstrap/src/transition/transition.js"></script>
+    <script src="components/ui-bootstrap/src/modal/modal.js"></script>
     <script src="components/jshashes/hashes.js"></script>
 
     <!-- sepawall scripts -->
@@ -38,20 +41,19 @@
 
 <!-- Wrap all page content here -->
 <div id="wrap">
-  
   <!-- Fixed navbar -->
-  <div class="navbar navbar-default navbar-fixed-top" bs-navbar>
+  <div class="navbar navbar-default navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle pull-left" style="margin-left: 8px">
-          <span class="sr-only">Toggle navigation</span>
+        <button type="button" class="navbar-toggle"
+            ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="./">sepawall</a>
+        <a class="navbar-brand" ng-href="#/generator">sepawall</a>
       </div>
-      <div class="collapse navbar-collapse">
+      <div collapse="navCollapsed" class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav">
           <li ui-route="/generator" ng-class="{active: $uiRoute}"><a ng-href="#/generator">Password generator</a></li>
           <li ui-route="/configuration" ng-class="{active: $uiRoute}"><a href="#/configuration">Configuration</a></li>
@@ -60,7 +62,7 @@
           <li ng-if="!ready"><a href="#" ng-click="login()">Login</a></li>
           <li class="disabled" ng-if="ready"><span class="navbar-text"><span class="glyphicon glyphicon-cloud"></span> Logged in!</span></li>
         </ul>
-      </div><!--/.nav-collapse -->
+      </div>
     </div>
   </div>
   

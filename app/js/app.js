@@ -1,6 +1,9 @@
 var sepawall = angular.module('sepawall', [
   'ngRoute',
   'ui.utils',
+  'ui.bootstrap.collapse',
+  'ui.bootstrap.transition',
+  'ui.bootstrap.modal',
   'google.api',
   'sepawall.configuration',
   'passwordmaker'

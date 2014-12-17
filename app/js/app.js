@@ -1,9 +1,6 @@
 var sepawall = angular.module('sepawall', [
   'ngRoute',
-  'mgcrea.ngStrap',
-  'mgcrea.ngStrap.navbar',
-  'mgcrea.ngStrap.tooltip',
-  'mgcrea.ngStrap.modal',
+  'ui.utils',
   'google.api',
   'sepawall.configuration',
   'passwordmaker'
@@ -159,7 +156,7 @@ sepawall.controller('PasswordGenerator', function($scope, profileManager, pMaker
   };
 });
 
-sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sepawallConf, pMaker) {
+sepawall.controller('ConfigurationEditor', function($scope, profile, sepawallConf, pMaker) {
 
   $scope.hashAlgorithms = pMaker.supportedAlgorithms();
 
@@ -184,12 +181,12 @@ sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sep
 
 
   $scope.showConfiguration = function() {
-    var stringProfile = angular.toJson(profile, true);
-    $modal({
-      title: 'Configuration',
-      content:'<pre>' + stringProfile + '</pre>',
-      html: true
-    });
+//     var stringProfile = angular.toJson(profile, true);
+//     $modal({
+//       title: 'Configuration',
+//       content:'<pre>' + stringProfile + '</pre>',
+//       html: true
+//     });
   };
 
   $scope.saveConfiguration = function() {

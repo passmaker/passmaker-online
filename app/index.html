@@ -14,14 +14,12 @@
     <link href="css/sticky-footer.css" rel="stylesheet">
 
     <script src="https://apis.google.com/js/client.js"></script>
-    <script src="components/jquery/dist/jquery.js"></script>
     <script src="components/angular/angular.js"></script>
     <script src="components/angular-animate/angular-animate.js"></script>
     <script src="components/angular-route/angular-route.js"></script>
     <script src="components/angular-resource/angular-resource.js"></script>
     <script src="components/angular-animate/angular-animate.js"></script>
-    <script src="components/angular-strap/dist/angular-strap.min.js"></script>
-    <script src="components/angular-strap/dist/angular-strap.tpl.min.js"></script>
+    <script src="components/angular-ui-utils/ui-utils.min.js"></script>
     <script src="components/jshashes/hashes.js"></script>
 
     <!-- sepawall scripts -->
@@ -55,8 +53,8 @@
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li data-match-route="/generator?"><a href="#/generator">Password generator</a></li>
-          <li data-match-route="/configuration?"><a href="#/configuration">Configuration</a></li>
+          <li ui-route="/generator" ng-class="{active: $uiRoute}"><a ng-href="#/generator">Password generator</a></li>
+          <li ui-route="/configuration" ng-class="{active: $uiRoute}"><a href="#/configuration">Configuration</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right" ng-controller="CloudLogin">
           <li ng-if="!ready"><a href="#" ng-click="login()">Login</a></li>

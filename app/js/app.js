@@ -155,13 +155,13 @@ sepawall.controller('PasswordGenerator', function($scope, profileManager, pMaker
   $scope.generatePassword = function() {
     var p = profileManager.getProfile($scope.inputText);
     $scope.customProfile = p.custom;
-    $scope.generatedPassword = pMaker(p, $scope.masterPassword, $scope.inputText, $scope.username);
+    $scope.generatedPassword = pMaker.generate(p, $scope.masterPassword, $scope.inputText, $scope.username);
   };
 });
 
-sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sepawallConf) {
+sepawall.controller('ConfigurationEditor', function($scope, $modal, profile, sepawallConf, pMaker) {
 
-  $scope.hashAlgorithms = ["sha1", "hmac-sha1", "sha256", "hmac-sha256", "rmd160", "hmac-rmd160"];
+  $scope.hashAlgorithms = pMaker.supportedAlgorithms();
 
   $scope.profile = profile;
 

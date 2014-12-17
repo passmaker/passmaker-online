@@ -13,18 +13,39 @@ angular.module('passwordmaker', [])
       };
     };
     
-    var factory = [];
-    factory['sha1']   = noHmac(Hashes.SHA1);
-    factory['sha256'] = noHmac(Hashes.SHA256);
-    factory['sha512'] = noHmac(Hashes.SHA512);
-    factory['rmd160'] = noHmac(Hashes.RMD160);
-    factory['hmac-sha1']   = hmac(Hashes.SHA1);
-    factory['hmac-sha256'] = hmac(Hashes.SHA256);
-    factory['hmac-sha512'] = hmac(Hashes.SHA512);
-    factory['hmac-rmd160'] = hmac(Hashes.RMD160);
+    var algorithms = [
+      { name: 'md5'        , hash: noHmac(Hashes.MD5)    },
+      { name: 'sha1'       , hash: noHmac(Hashes.SHA1)   },
+      { name: 'sha256'     , hash: noHmac(Hashes.SHA256) },
+      { name: 'sha512'     , hash: noHmac(Hashes.SHA512) },
+      { name: 'rmd160'     , hash: noHmac(Hashes.RMD160) },
+      { name: 'hmac-md5'   , hash:   hmac(Hashes.MD5)    },
+      { name: 'hmac-sha1'  , hash:   hmac(Hashes.SHA1)   },
+      { name: 'hmac-sha256', hash:   hmac(Hashes.SHA256) },
+      { name: 'hmac-sha512', hash:   hmac(Hashes.SHA512) },
+      { name: 'hmac-rmd160', hash:   hmac(Hashes.RMD160) }
+    ];
 
-    return function(profile, masterPassword, inputText, username) {
-      var hash = factory[profile.hashAlgorithm],
+    var getAlgorithm = function(algorithmName) {
+      var searchedAlgo;
+      angular.forEach(algorithms, function(algo) {
+        if (algo.name == algorithmName) {
+          searchedAlgo = algo;
+        }
+      });
+      return searchedAlgo;
+    };
+
+    this.supportedAlgorithms = function() {
+      var names = [];
+      angular.forEach(algorithms, function(algo) {
+        names.push(algo.name);
+      });
+      return names;
+    };
+
+    this.generate = function(profile, masterPassword, inputText, username) {
+      var hash = getAlgorithm(profile.hashAlgorithm).hash,
           mp = masterPassword ? masterPassword : '',
           input = inputText ? inputText : '',
           user = username ? username : '',

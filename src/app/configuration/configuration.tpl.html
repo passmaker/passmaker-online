@@ -1,0 +1,84 @@
+<form name="configuration" class="form-horizontal" role="form">
+  <div class="panel panel-default">
+    <div class="panel-heading">Defaults</div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label for="hashAlgorithm" class="col-sm-3 control-label">Hash algorithm</label>
+        <div class="col-sm-9">
+          <select id="hashAlgorithm" class="form-control" ng-model="profile.hashAlgorithm" ng-options="algorithm for algorithm in hashAlgorithms">
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="passwordLength" class="col-sm-3 control-label">Password length</label>
+        <div class="col-sm-9">
+          <input id="passwordLength" type="number" class="form-control" ng-model="profile.passwordLength" min="1" integer />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="characters" class="col-sm-3 control-label">Characters</label>
+        <div class="col-sm-9">
+          <input id="characters" type="text" class="form-control" ng-model="profile.characters" ng-required />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Exceptions</div>
+    <div class="panel-body">
+      <div class="alert alert-info" role="alert">
+        <i class="fa fa-info pull-left" style="font-size: 2em"></i>
+        <p>
+          Exceptions allow per service configuration in order to comply to specific service security policy.
+        </p>
+      </div>
+      <button class="btn btn-success pull-right" ng-click="addException()"><i class="fa fa-plus-circle"></i> Add exception</button>
+      <p>
+        You can modify the Password length to truncate the password.<br />
+        Use the modifier to change the generated password. You should use this typically when a service has been compromised. This is also useful to avoid a password with a special character not handled correctly by the service.
+      </p>
+    </div>
+    <ul class="list-group">
+      <li class="list-group-item" ng-repeat="exception in profile.exceptions">
+        <div class="form-group">
+          <label for="exception-{{ $index }}" class="col-sm-3 control-label">Service</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+              <input id="exception-{{ $index }}" type="text" class="form-control" ng-model="exception.service" />
+              <span class="input-group-btn">
+                <button class="btn btn-danger" type="button" ng-click="removeException($index)">Remove</button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="passwordLength-{{ $index }}" class="col-sm-3 control-label">Password length</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox" ng-model="exception.passwordLength.override">
+              </span>
+              <input id="passwordLength-{{ $index }}" type="number" class="form-control" ng-model="exception.passwordLength.value" ng-disabled="!exception.passwordLength.override" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="modifier-{{ $index }}" class="col-sm-3 control-label">Modifier</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <input type="checkbox" ng-model="exception.modifier.override">
+              </span>
+              <input id="modifier-{{ $index }}" type="text" class="form-control" ng-model="exception.modifier.value" ng-disabled="!exception.modifier.override" />
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="pull-right">
+    <button class="btn btn-default" ng-click="restoreConfiguration()">Restore</button>
+    <button class="btn btn-default" ng-click="showConfiguration()">Show</button>
+    <button class="btn btn-primary" ng-click="saveConfiguration()"><i class="fa fa-floppy-o"></i> Save</button>
+  </div>
+</form>

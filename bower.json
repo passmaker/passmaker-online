@@ -13,5 +13,8 @@
     "angular-ui-router": "~0.2",
     "jshashes": "~1.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "resolutions": {
+    "angular": "~1.3"
+  }
 }

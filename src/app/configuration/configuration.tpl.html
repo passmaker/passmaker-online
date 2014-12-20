@@ -2,23 +2,26 @@
   <div class="panel panel-default">
     <div class="panel-heading">Defaults</div>
     <div class="panel-body">
-      <div class="form-group">
+      <div class="form-group" ng-class="{'has-error': configuration.hashAlgorithm.$invalid}">
         <label for="hashAlgorithm" class="col-sm-3 control-label">Hash algorithm</label>
         <div class="col-sm-9">
-          <select id="hashAlgorithm" class="form-control" ng-model="profile.hashAlgorithm" ng-options="algorithm for algorithm in hashAlgorithms">
+          <select name="hashAlgorithm" class="form-control" ng-model="profile.hashAlgorithm" ng-options="algorithm for algorithm in hashAlgorithms"
+              required>
           </select>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" ng-class="{'has-error': configuration.passwordLength.$invalid}">
         <label for="passwordLength" class="col-sm-3 control-label">Password length</label>
         <div class="col-sm-9">
-          <input id="passwordLength" type="number" class="form-control" ng-model="profile.passwordLength" min="1" integer />
+          <input name="passwordLength" type="number" class="form-control" ng-model="profile.passwordLength"
+              required integer min="1" ng-minlength="1" ng-pattern="/^[0-9]+$/" />
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" ng-class="{'has-error': configuration.characters.$invalid}">
         <label for="characters" class="col-sm-3 control-label">Characters</label>
         <div class="col-sm-9">
-          <input id="characters" type="text" class="form-control" ng-model="profile.characters" ng-required />
+          <input name="characters" type="text" class="form-control" ng-model="profile.characters"
+              required ng-minlength="2" />
         </div>
       </div>
     </div>
@@ -58,7 +61,7 @@
               <span class="input-group-addon">
                 <input type="checkbox" ng-model="exception.passwordLength.override">
               </span>
-              <input id="passwordLength-{{ $index }}" type="number" class="form-control" ng-model="exception.passwordLength.value" ng-disabled="!exception.passwordLength.override" />
+              <input id="passwordLength-{{ $index }}" type="number" class="form-control" ng-model="exception.passwordLength.value" ng-disabled="!exception.passwordLength.override" ng-pattern="/\d+/" />
             </div>
           </div>
         </div>
@@ -79,6 +82,6 @@
   <div class="pull-right">
     <button class="btn btn-default" ng-click="restoreConfiguration()">Restore</button>
     <button class="btn btn-default" ng-click="showConfiguration()">Show</button>
-    <button class="btn btn-primary" ng-click="saveConfiguration()"><i class="fa fa-floppy-o"></i> Save</button>
+    <button class="btn btn-primary" ng-click="saveConfiguration()" ng-disabled="configuration.$invalid"><i class="fa fa-floppy-o"></i> Save</button>
   </div>
 </form>

@@ -49,7 +49,7 @@ angular.module( 'passmaker', [
       $scope.ready = true;
       passMakerConf.load();
     }, function(authResult) {
-      console.log('Authentication check completed');
+      console.log('Authentication check failed');
       console.log(authResult);
       $scope.ready = false;
     });

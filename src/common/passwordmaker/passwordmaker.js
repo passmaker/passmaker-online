@@ -1,6 +1,6 @@
 angular.module('passwordmaker', [])
 
-.service('pMaker', function() {
+.service('pMaker', function($q) {
 
   var noHmac = function(Algo) {
     return function(key, data, chars) {
@@ -45,7 +45,9 @@ angular.module('passwordmaker', [])
   };
 
   this.generate = function(profile, masterPassword, inputText, username) {
-    var hash = getAlgorithm(profile.hashAlgorithm).hash,
+    var deferred = $q.defer();
+
+    var algo = getAlgorithm(profile.hashAlgorithm),
         mp = masterPassword ? masterPassword : '',
         input = inputText ? inputText : '',
         user = username ? username : '',
@@ -54,12 +56,21 @@ angular.module('passwordmaker', [])
         data = input + user + mod,
         chars = profile.characters;
 
-    var password = '';
-    for (var i = 0; password.length < pLength; i++) {
-      var alt = i === 0 ? '' : '\n' + i;
-      password += hash(masterPassword + alt, data, chars);
+    if (algo === undefined) {
+      deferred.reject('Unknown algorithm: ' + profile.hashAlgorithm);
+    } else if (chars === undefined || chars.length < 2) {
+      deferred.reject('Invalid character set: ' + chars);
+    } else if (pLength !== parseInt(pLength, 10)) {
+      deferred.reject('Invalid password length: ' + pLength);
+    } else {
+      var password = '';
+      for (var i = 0; password.length < pLength; i++) {
+        var alt = i === 0 ? '' : '\n' + i;
+        password += algo.hash(masterPassword + alt, data, chars);
+      }
+      deferred.resolve(password.substring(0, pLength));
     }
-    return password.substring(0, pLength);
+    return deferred.promise;
   };
 
 })

@@ -13,17 +13,28 @@ angular.module('passmaker.generator', [
 
 .controller('PasswordGeneratorCtrl', function($scope, profileManager, pMaker) {
 
-  var pHashCheck = {
-    hashAlgorithm: 'sha1',
-    characters: '01',
-    passwordLength: 9
-  };
-
   $scope.generatePassword = function() {
+    // generate a random value to display the master password control hash
+    var pHashCheck = {
+      hashAlgorithm: 'sha1',
+      characters: '01',
+      passwordLength: 9
+    };
+    pMaker.generate(pHashCheck, $scope.masterPassword, 'hashcheck', '')
+      .then(function(bitValue) {
+        $scope.controlHash = parseInt(bitValue, 2);
+      });
+
+    // generate the final password
     var p = profileManager.getProfile($scope.inputText);
     $scope.customProfile = p.custom;
-    $scope.generatedPassword = pMaker.generate(p, $scope.masterPassword, $scope.inputText, $scope.username);
-    $scope.controlHash = parseInt(pMaker.generate(pHashCheck, $scope.masterPassword, 'hashcheck', ''), 2);
+    pMaker.generate(p, $scope.masterPassword, $scope.inputText, $scope.username)
+      .then(function(generatedPassword) {
+        $scope.error = '';
+        $scope.generatedPassword = generatedPassword;
+      }, function(error) {
+        $scope.error = error;
+      });
   };
 })
 

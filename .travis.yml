@@ -1,13 +1,17 @@
+# run on travis docker infrastructure
+sudo: false
+
 language: node_js
 node_js:
-  - "0.10"
+- '0.10'
 
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - npm install --quiet -g grunt-cli karma bower
-  - npm install
-  - bower install
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- npm install --quiet -g grunt-cli karma bower
+- npm install
+- bower install
 
 script: grunt
 
+after_success: "./deploy/deploy_if_production.sh"

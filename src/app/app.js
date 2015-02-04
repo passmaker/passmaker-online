@@ -114,7 +114,7 @@ angular.module( 'passmaker', [
           'description' : 'PassMaker configuration file',
           'properties' : [ {
               'key': 'passmaker-version',
-              'value': 'v1',
+              'value': passMakerVersion,
               'visibility': 'PRIVATE'
             }
           ]

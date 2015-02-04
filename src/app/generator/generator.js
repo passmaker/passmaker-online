@@ -17,12 +17,12 @@ angular.module('passmaker.generator', [
     // generate a random value to display the master password control hash
     var pHashCheck = {
       hashAlgorithm: 'sha1',
-      characters: '01',
-      passwordLength: 9
+      characters: 'ABCDEFGHIFKLMNOPQRSTUVWXYZ',
+      passwordLength: 3
     };
     pMaker.generate(pHashCheck, $scope.masterPassword, 'hashcheck', '')
-      .then(function(bitValue) {
-        $scope.controlHash = parseInt(bitValue, 2);
+      .then(function(hash) {
+        $scope.controlHash = hash;
       });
 
     // generate the final password

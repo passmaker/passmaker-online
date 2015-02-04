@@ -1,4 +1,4 @@
-<div ng-if="error" class="alert alert-danger" role="alert"">
+<div ng-if="error" class="alert alert-danger" role="alert">
   <i class="fa fa-exclamation-triangle"></i>
   {{ error }}
 </div>
@@ -9,7 +9,7 @@
       <div class="input-group">
         <input id="masterPassword" type="password" class="form-control" ng-model="masterPassword" ng-change="generatePassword()" />
         <div class="input-group-addon">
-          <span class="master-password-control-hash"><i class="fh-qr-{{controlHash}}"></i></span>
+          <span class="master-password-control-hash">{{controlHash}}</span>
         </div>
       </div>
     </div>

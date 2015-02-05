@@ -39,12 +39,10 @@ angular.module('google.api', [])
           // 2.
           gapi.auth.authorize(options, function(authResult) {
             console.log('Requesting new token');
-
-            self.token.secret = authResult.access_token;
-            self.token.expiration = new Date(authResult.expires_at * 1000);
-
             // 3.
             if (authResult && !authResult.error) {
+              self.token.secret = authResult.access_token;
+              self.token.expiration = new Date(authResult.expires_at * 1000);
               console.log('Successfuly got new token valid until ' + self.token.expiration.toLocaleString());
               deferred.resolve(self.token);
             } else {

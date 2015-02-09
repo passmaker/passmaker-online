@@ -29,16 +29,20 @@
   <div class="panel panel-default">
     <div class="panel-heading">Exceptions</div>
     <div class="panel-body">
-      <div class="alert alert-info" role="alert">
-        <i class="fa fa-info pull-left" style="font-size: 2em"></i>
+      <div class="bs-callout bs-callout-info" id="callout-helper-bg-specificity">
+        <h4>
+          <i class="fa fa-info pull-left"></i>
+          Dealing with specificity
+        </h4>
         <p>
-          Exceptions allow per service configuration in order to comply to specific service security policy.
+          Sometimes, in the best case, web sites password policy are more strict than your default configuration, or in the worst case the password generated isn't accepted by the service provider security policy. For these cases, you wan override the main configuration:
+          <ul>
+            <li>password length</li>
+            <li>add a <em>modifier</em> to alter the generated password</li>
+            <li>change the caracter set used to generate the password</li>
+          </ul>
         </p>
       </div>
-      <button class="btn btn-success pull-right" ng-click="addException()"><i class="fa fa-plus-circle"></i> Add exception</button>
-      <p>
-        You can modify the Password length to truncate the password.<br />
-        Use the modifier to change the generated password. You should use this typically when a service has been compromised. This is also useful to avoid a password with a special character not handled correctly by the service.
       </p>
     </div>
     <ul class="list-group">
@@ -87,6 +91,12 @@
             </div>
           </div>
         </div>
+      </li>
+      <li class="list-group-item">
+        <div class="pull-right">
+          <button class="btn btn-success" ng-click="addException()"><i class="fa fa-plus-circle"></i> Add exception</button>
+        </div>
+        <span class="clearfix"></span>
       </li>
     </ul>
   </div>

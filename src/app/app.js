@@ -12,14 +12,6 @@ angular.module( 'passmaker', [
 
 .constant('passMakerVersion', 'v0.1.0')
 
-.constant('googleClientConfiguration', {
-  clientId: '452858183186-vnq9jcgt1heeveppo8nrnsvn1sep0q15.apps.googleusercontent.com',
-  scopes: [
-    'https://www.googleapis.com/auth/drive.file'
-  ],
-  domain: 'localhost'
-})
-
 .constant('gAuthConfiguration', {
   clientId: '452858183186-vnq9jcgt1heeveppo8nrnsvn1sep0q15.apps.googleusercontent.com',
   scopes: [

@@ -1,11 +1,12 @@
 describe('pMaker', function() {
 
-  var pMaker;
+  var pMaker, $rootScope;
 
   beforeEach(module('passwordmaker'));
 
-  beforeEach(inject(function(_pMaker_) {
+  beforeEach(inject(function(_pMaker_, _$rootScope_) {
     pMaker = _pMaker_;
+    $rootScope = _$rootScope_;
   }));
 
   it('should knows 10 hash algorithms', function() {
@@ -22,4 +23,61 @@ describe('pMaker', function() {
     expect(algorithms).toContain('hmac-sha512');
     expect(algorithms).toContain('hmac-rmd160');
   });
+
+  it('can generate bertrand\'s password', function() {
+    var profile = {
+      hashAlgorithm: 'hmac-sha256',
+      passwordLength: 6,
+      characters: 'abcd1234'
+    };
+    var password;
+    pMaker.generate(profile, 'secret', 'github.com', 'bertrand').then(function(generatedPassword) {
+      password = generatedPassword;
+    });
+    $rootScope.$apply();
+    expect(password).toBe('bc4ab2');
+  });
+
+  it('fails on unknown algorithm', function() {
+    var profile = {
+      hashAlgorithm: 'WTF?',
+      passwordLength: 6,
+      characters: 'abcd1234'
+    };
+    var error;
+    pMaker.generate(profile, 'secret', 'github.com', 'bertrand').then(undefined, function(message) {
+      error = message;
+    });
+    $rootScope.$apply();
+    expect(error).toBe('Unknown algorithm: WTF?');
+  });
+
+  it('fails on invalid password length', function() {
+    var profile = {
+      hashAlgorithm: 'hmac-sha256',
+     passwordLength: 'six',
+      characters: 'abcd1234'
+    };
+    var error;
+    pMaker.generate(profile, 'secret', 'github.com', 'bertrand').then(undefined, function(message) {
+      error = message;
+    });
+    $rootScope.$apply();
+    expect(error).toBe('Invalid password length: six');
+  });
+
+  it('fails on too small character set', function() {
+    var profile = {
+      hashAlgorithm: 'hmac-sha256',
+     passwordLength: 6,
+      characters: 'X'
+    };
+    var error;
+    pMaker.generate(profile, 'secret', 'github.com', 'bertrand').then(undefined, function(message) {
+      error = message;
+    });
+    $rootScope.$apply();
+    expect(error).toBe('Invalid character set: X');
+  });
+
 });

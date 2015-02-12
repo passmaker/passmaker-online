@@ -241,12 +241,6 @@
     for (i = remainders.length - 1; i >= 0; i--) {
       output += encoding.charAt(remainders[i]);
     }
-
-    /* Append leading zero equivalents */
-    full_length = Math.ceil(input.length * 8 / (Math.log(encoding.length) / Math.log(2)));
-    for (i = output.length; i < full_length; i += 1) {
-      output = encoding[0] + output;
-    }
     return output;
   }
 

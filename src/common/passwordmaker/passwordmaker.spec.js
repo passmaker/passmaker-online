@@ -55,7 +55,7 @@ describe('pMaker', function() {
   it('fails on invalid password length', function() {
     var profile = {
       hashAlgorithm: 'hmac-sha256',
-     passwordLength: 'six',
+      passwordLength: 'six',
       characters: 'abcd1234'
     };
     var error;
@@ -69,7 +69,7 @@ describe('pMaker', function() {
   it('fails on too small character set', function() {
     var profile = {
       hashAlgorithm: 'hmac-sha256',
-     passwordLength: 6,
+      passwordLength: 6,
       characters: 'X'
     };
     var error;
@@ -78,6 +78,34 @@ describe('pMaker', function() {
     });
     $rootScope.$apply();
     expect(error).toBe('Invalid character set: X');
+  });
+
+  it('can generate same 20 char password as legacy passwordmaker', function() {
+    var profile = {
+      hashAlgorithm: 'hmac-sha256',
+      passwordLength: 20,
+      characters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_-+={}|[]\\:";\'<>?,./'
+    };
+    var password;
+    pMaker.generate(profile, '.', '.', '').then(function(generatedPassword) {
+      password = generatedPassword;
+    });
+    $rootScope.$apply();
+    expect(password).toEqual('2gSc#fq;R&(]:6|h+>q@');
+  });
+
+  it('can generate same 60 char password as legacy passwordmaker', function() {
+    var profile = {
+      hashAlgorithm: 'hmac-sha256',
+      passwordLength: 60,
+      characters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_-+={}|[]\\:";\'<>?,./'
+    };
+    var password;
+    pMaker.generate(profile, '.', '.', '').then(function(generatedPassword) {
+      password = generatedPassword;
+    });
+    $rootScope.$apply();
+    expect(password).toEqual('2gSc#fq;R&(]:6|h+>q@ShI)Ju9l`p.$v<o#{~Oh}f$/Z|Je9CVH8ug/9FtC');
   });
 
 });

@@ -13,7 +13,7 @@ angular.module('passmaker.configuration', [
   });
 })
 
-.controller('ConfigurationCtrl', function($scope, profile, pMaker, passMakerConf, $modal) {
+.controller('ConfigurationCtrl', function($scope, profile, pMaker, passMakerConf, $modal, $q) {
 
   $scope.hashAlgorithms = pMaker.supportedAlgorithms();
 
@@ -31,6 +31,24 @@ angular.module('passmaker.configuration', [
 
   $scope.removeException = function(i) {
     $scope.profile.exceptions.splice(i, 1);
+  };
+
+  $scope.suggestConstraints = function(query) {
+    var characterSets = [
+      'digit', 'letter', 'lowercase letter', 'uppercase letter', 'of ,.-!'
+    ];
+    var tags = [];
+    var qryStruct = /^(?:(\d+)(?:\s(.*))?)|(?:.*)$/i.exec(query);
+    var inputAmount = qryStruct[1] || '1';
+    var inputCharacterSet = qryStruct[2] || '';
+    angular.forEach(characterSets, function(characterSet) {
+      if (characterSet.indexOf(inputCharacterSet) > -1) {
+        tags.push(inputAmount + ' ' + characterSet);
+      }
+    });
+    var deferred = $q.defer();
+    deferred.resolve(tags);
+    return deferred.promise;
   };
 
   $scope.restoreConfiguration = function() {

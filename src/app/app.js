@@ -145,9 +145,6 @@ angular.module( 'passmaker', [
         if (exception.modifier.override === true) {
           p.modifier = exception.modifier.value;
         }
-        if (exception.characters.override === true) {
-          p.characters = exception.characters.value;
-        }
       }
     });
     return p;

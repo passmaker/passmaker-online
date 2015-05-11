@@ -81,17 +81,6 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="characters-{{ $index }}" class="col-sm-3 control-label">Characters</label>
-          <div class="col-sm-9">
-            <div class="input-group">
-              <span class="input-group-addon">
-                <input type="checkbox" ng-model="exception.characters.override">
-              </span>
-              <input id="characters-{{ $index }}" type="text" class="form-control" ng-model="exception.characters.value" ng-disabled="!exception.characters.override" />
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
           <label for="constraints-{{ $index }}" class="col-sm-3 control-label">Constraints</label>
           <div class="col-sm-9">
             <tags-input id="constraints-{{ $index }}" ng-model="exception.constraints" placeholder="1 digit, 1 uppercase letter, 1 of #~!,$" add-on-blur="false" allow-leftover-text="false" replace-spaces-with-dashes="false">

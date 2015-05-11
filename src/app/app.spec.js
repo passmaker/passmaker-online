@@ -10,7 +10,6 @@ describe('profileManager', function() {
     exception = {
       service: 'exception-website.com',
       passwordLength: { override: false },
-      characters:     { override: false },
       modifier:       { override: false }
     };
   });
@@ -67,20 +66,6 @@ describe('profileManager', function() {
       passwordLength: 6,
       characters: 'default-characters',
       modifier: 'alt'
-    });
-  }));
-
-  it('should return custom profile when character set is overrided', inject(function() {
-    exception.characters = { override: true, value: 'custom-characters' };
-
-    var p = profileManager.getProfile('exception-website.com');
-
-    expect(p).toEqual({
-      custom: true,
-      hashAlgorithm: 'default-hash',
-      passwordLength: 6,
-      characters: 'custom-characters',
-      modifier: undefined
     });
   }));
 

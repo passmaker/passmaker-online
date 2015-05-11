@@ -19,7 +19,8 @@ describe('profileManager', function() {
       hashAlgorithm:  'default-hash',
       characters:     'default-characters',
       passwordLength: 6,
-      exceptions: [ exception ]
+      exceptions: [ exception ],
+      constraints: []
     };
     module(function($provide) {
       $provide.value('profile', mockProfile);
@@ -37,7 +38,8 @@ describe('profileManager', function() {
       hashAlgorithm: 'default-hash',
       passwordLength: 6,
       characters: 'default-characters',
-      modifier: undefined
+      modifier: undefined,
+      constraints: []
     });
   }));
 
@@ -51,7 +53,8 @@ describe('profileManager', function() {
       hashAlgorithm: 'default-hash',
       passwordLength: 5,
       characters: 'default-characters',
-      modifier: undefined
+      modifier: undefined,
+      constraints: []
     });
   }));
 
@@ -65,7 +68,25 @@ describe('profileManager', function() {
       hashAlgorithm: 'default-hash',
       passwordLength: 6,
       characters: 'default-characters',
-      modifier: 'alt'
+      modifier: 'alt',
+      constraints: []
+    });
+  }));
+
+  it('should return custom profile when a constraint is set', inject(function() {
+    exception.constraints = [
+      '1 digit'
+    ];
+
+    var p = profileManager.getProfile('exception-website.com');
+
+    expect(p).toEqual({
+      custom: true,
+      hashAlgorithm: 'default-hash',
+      passwordLength: 6,
+      characters: 'default-characters',
+      modifier: undefined,
+      constraints: [ { amount: 1, characters: '0123456789' } ]
     });
   }));
 

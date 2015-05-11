@@ -20,6 +20,13 @@ angular.module( 'passmaker', [
   ]
 })
 
+.constant('defaultCharacterSets', {
+  'digit': '0123456789',
+  'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  'lowercase letter': 'abcdefghijklmnopqrstuvwxyz',
+  'uppercase letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+})
+
 .config(function($urlRouterProvider) {
   $urlRouterProvider.otherwise('/generator');
 })
@@ -128,13 +135,14 @@ angular.module( 'passmaker', [
   };
 })
 
-.service('profileManager', function (profile) {
+.service('profileManager', function (profile, defaultCharacterSets) {
   this.getProfile = function(inputText) {
     var p = {
       custom: false,
       hashAlgorithm: profile.hashAlgorithm,
       characters: profile.characters,
-      passwordLength: profile.passwordLength
+      passwordLength: profile.passwordLength,
+      constraints: []
     };
     angular.forEach(profile.exceptions, function(exception) {
       if (inputText && inputText == exception.service) {
@@ -145,6 +153,11 @@ angular.module( 'passmaker', [
         if (exception.modifier.override === true) {
           p.modifier = exception.modifier.value;
         }
+        angular.forEach(exception.constraints, function(constraint) {
+          var c = /^(\d+) (.+)$/g.exec(constraint);
+          var chars = defaultCharacterSets[c[2]] || c[2];
+          p.constraints.push({ 'amount': parseInt(c[1], 10), 'characters': chars });
+        });
       }
     });
     return p;

@@ -14,4 +14,4 @@ before_script:
 
 script: grunt
 
-after_success: "./deploy/deploy_if_production.sh"
+after_success: "./deploy/deploy.sh"

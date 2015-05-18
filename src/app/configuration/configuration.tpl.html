@@ -48,10 +48,10 @@
     <ul class="list-group">
       <li class="list-group-item" ng-repeat="exception in profile.exceptions">
         <div class="form-group">
-          <label for="exception-{{ $index }}" class="col-sm-3 control-label">Service</label>
+          <label for="exception-{{ $index }}" class="col-sm-3 control-label">Input text patterns</label>
           <div class="col-sm-9">
             <div class="input-group">
-              <input id="exception-{{ $index }}" type="text" class="form-control" ng-model="exception.service" />
+              <tags-input id="exception-{{ $index }}" ng-model="exception.patterns" placeholder="*.google.com" add-on-blur="false" allow-leftover-text="false" replace-spaces-with-dashes="false"></tags-input>
               <span class="input-group-btn">
                 <button class="btn btn-danger" type="button" ng-click="removeException($index)">Remove</button>
               </span>
@@ -83,7 +83,7 @@
         <div class="form-group">
           <label for="constraints-{{ $index }}" class="col-sm-3 control-label">Constraints</label>
           <div class="col-sm-9">
-            <tags-input id="constraints-{{ $index }}" ng-model="exception.constraints" placeholder="1 digit, 1 uppercase letter, 1 of #~!,$" add-on-blur="false" allow-leftover-text="false" replace-spaces-with-dashes="false">
+            <tags-input id="constraints-{{ $index }}" ng-model="exception.constraints" placeholder="1 uppercase letter" add-on-blur="false" allow-leftover-text="false" replace-spaces-with-dashes="false">
               <auto-complete source="suggestConstraints($query)" min-length="1" load-on-down-arrow="true" load-on-focus="true"></auto-complete>
             </tags-input>
           </div>

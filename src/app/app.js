@@ -145,7 +145,13 @@ angular.module( 'passmaker', [
       constraints: []
     };
     angular.forEach(profile.exceptions, function(exception) {
-      if (inputText && inputText == exception.service) {
+      var matches = false;
+      angular.forEach(exception.patterns, function(pattern) {
+        if (new RegExp('^' + pattern.text + '$', 'i').test(inputText)) {
+          matches = true;
+        }
+      });
+      if (matches) {
         p.custom = true;
         if (exception.passwordLength.override === true) {
           p.passwordLength = exception.passwordLength.value;
@@ -154,7 +160,7 @@ angular.module( 'passmaker', [
           p.modifier = exception.modifier.value;
         }
         angular.forEach(exception.constraints, function(constraint) {
-          var c = /^(\d+) (.+)$/g.exec(constraint);
+          var c = /^(\d+) (.+)$/.exec(constraint.text);
           var chars = defaultCharacterSets[c[2]] || c[2];
           p.constraints.push({ 'amount': parseInt(c[1], 10), 'characters': chars });
         });

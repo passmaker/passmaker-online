@@ -8,7 +8,7 @@ describe('profileManager', function() {
 
   beforeEach(function() {
     exception = {
-      service: 'exception-website.com',
+      patterns: [ { text: 'exception-.*.com' } ],
       passwordLength: { override: false },
       modifier:       { override: false }
     };
@@ -75,7 +75,7 @@ describe('profileManager', function() {
 
   it('should return custom profile when a constraint is set', inject(function() {
     exception.constraints = [
-      '1 digit'
+      { text: '1 digit' }
     ];
 
     var p = profileManager.getProfile('exception-website.com');

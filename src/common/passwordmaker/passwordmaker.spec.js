@@ -108,4 +108,18 @@ describe('pMaker', function() {
     expect(password).toEqual('2gSc#fq;R&(]:6|h+>q@ShI)Ju9l`p.$v<o#{~Oh}f$/Z|Je9CVH8ug/9FtC');
   });
 
+  it('generates a password containing the letter "A" when a constraint "1 of A" is set', function() {
+    var profile = {
+      hashAlgorithm: 'hmac-sha256',
+      passwordLength: 6,
+      characters: '0123456789',
+      constraints: [ { amount: 1, characters: 'A' } ]
+    };
+    var password;
+    pMaker.generate(profile, 'secret', 'github.com', 'bertrand').then(function(generatedPassword) {
+      password = generatedPassword;
+    });
+    $rootScope.$apply();
+    expect(password).toContain('A');
+  });
 });

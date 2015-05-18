@@ -36,6 +36,15 @@ angular.module('passwordmaker', [])
     return searchedAlgo;
   };
 
+  var hash = function(algo, key, data, chars, length) {
+    var h = '';
+    for (var i = 0; h.length < length; i++) {
+      var alt = i === 0 ? '' : '\n' + i;
+      h += algo.hash(key + alt, data, chars);
+    }
+    return h.substring(0, length);
+  };
+
   this.supportedAlgorithms = function() {
     var names = [];
     angular.forEach(algorithms, function(algo) {
@@ -56,6 +65,20 @@ angular.module('passwordmaker', [])
         data = input + user + mod,
         chars = profile.characters;
 
+    var mandatory = [];
+    angular.forEach(profile.constraints, function(constraint) {
+      if (constraint.amount === 0) {
+        var forbiddenChars = constraint.characters.split('');
+        for (i = 0; i < forbiddenChars.length; i++) {
+          chars = chars.replace(forbiddenChars[i], '');
+        }
+      } else {
+        for (i = 0; i < constraint.amount; i++) {
+          mandatory.push(constraint.characters);
+        }
+      }
+    });
+
     if (algo === undefined) {
       deferred.reject('Unknown algorithm: ' + profile.hashAlgorithm);
     } else if (chars === undefined || chars.length < 2) {
@@ -63,12 +86,14 @@ angular.module('passwordmaker', [])
     } else if (pLength !== parseInt(pLength, 10)) {
       deferred.reject('Invalid password length: ' + pLength);
     } else {
-      var password = '';
-      for (var i = 0; password.length < pLength; i++) {
-        var alt = i === 0 ? '' : '\n' + i;
-        password += algo.hash(masterPassword + alt, data, chars);
-      }
-      deferred.resolve(password.substring(0, pLength));
+      pLength = pLength - mandatory.length;
+      var pass = hash(algo, masterPassword, data, chars, pLength);
+      angular.forEach(mandatory, function(characters) {
+        var i = parseInt(hash(algo, masterPassword, data, '0123456789', pLength.toString().length), '10') % pLength;
+        var c = hash(algo, masterPassword, data, characters + characters, 1);
+        pass = [pass.slice(0, i), c, pass.slice(i)].join('');
+      });
+      deferred.resolve(pass);
     }
     return deferred.promise;
   };

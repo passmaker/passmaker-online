@@ -38,9 +38,9 @@ for deployment in $(comm -13 <(echo "$active_branches") <(echo "$current_deploym
   git commit -m "Undeploy $deployment"
 done
 
-for prdeployment in $(find . -maxdepth 2 -path './pull-request/*' -regex '\d+') ; do
-  local id=$(basename $prdeployment)
-  local state=$(curl -s https://api.github.com/repos/passmaker/passmaker-online/pulls/$id | jq -r '.state')
+for prdeployment in $(find . -maxdepth 3 -path './pull-request/*' -type f -name '.deployment' -exec dirname {} \+ | sed 's/\.\///g') ; do
+  id=$(basename $prdeployment)
+  state=$(curl -s https://api.github.com/repos/passmaker/passmaker-online/pulls/$id | jq -r '.state')
   if [ "X$state" != "Xopen" ] ; then
     echo "<<< Undeploy PR #$id"
     git rm -r $prdeployment

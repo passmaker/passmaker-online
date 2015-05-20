@@ -22,9 +22,10 @@ angular.module('passmaker.configuration', [
   $scope.addException = function() {
     $scope.profile.exceptions = $scope.profile.exceptions || [];
     $scope.profile.exceptions.push({
-      'service': 'New service name',
+      'patterns': [],
       'passwordLength': { 'override': false, 'value': '' },
-      'modifier': { 'override': false, 'value': '' }
+      'modifier': { 'override': false, 'value': '' },
+      'constraints': []
     });
   };
 

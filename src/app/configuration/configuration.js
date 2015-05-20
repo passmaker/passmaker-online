@@ -67,27 +67,4 @@ angular.module('passmaker.configuration', [
   };
 })
 
-.service('profileManager', function(profile) {
-  this.getProfile = function(inputText) {
-    var p = {
-      custom: false,
-      hashAlgorithm: profile.hashAlgorithm,
-      characters: profile.characters,
-      passwordLength: profile.passwordLength
-    };
-    angular.forEach(profile.exceptions, function(exception) {
-      if (inputText && inputText == exception.service) {
-        p.custom = true;
-        if (exception.passwordLength.override === true) {
-          p.passwordLength = exception.passwordLength.value;
-        }
-        if (exception.modifier.override === true) {
-          p.modifier = exception.modifier.value;
-        }
-      }
-    });
-    return p;
-  };
-})
-
 ;

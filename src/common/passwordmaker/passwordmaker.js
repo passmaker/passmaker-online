@@ -1,6 +1,6 @@
 angular.module('passwordmaker', [])
 
-.service('pMaker', function($q) {
+.service('h', function() {
 
   var noHmac = function(Algo) {
     return function(key, data, chars) {
@@ -36,15 +36,6 @@ angular.module('passwordmaker', [])
     return searchedAlgo;
   };
 
-  var hash = function(algo, key, data, chars, length) {
-    var h = '';
-    for (var i = 0; h.length < length; i++) {
-      var alt = i === 0 ? '' : '\n' + i;
-      h += algo.hash(key + alt, data, chars);
-    }
-    return h.substring(0, length);
-  };
-
   this.supportedAlgorithms = function() {
     var names = [];
     angular.forEach(algorithms, function(algo) {
@@ -53,10 +44,31 @@ angular.module('passwordmaker', [])
     return names;
   };
 
+  this.supports = function(algorithmName) {
+    return getAlgorithm(algorithmName) !== undefined;
+  };
+
+  this.generate = function(algo, key, data, chars, length) {
+    var h = '';
+    for (var i = 0; h.length < length; i++) {
+      var alt = i === 0 ? '' : '\n' + i;
+      h += getAlgorithm(algo).hash(key + alt, data, chars);
+    }
+    return h.substring(0, length);
+  };
+
+})
+
+.service('pMaker', function($q, h) {
+
+  this.supportedAlgorithms = function() {
+    return h.supportedAlgorithms();
+  };
+
   this.generate = function(profile, masterPassword, inputText, username) {
     var deferred = $q.defer();
 
-    var algo = getAlgorithm(profile.hashAlgorithm),
+    var algo = profile.hashAlgorithm,
         mp = masterPassword ? masterPassword : '',
         input = inputText ? inputText : '',
         user = username ? username : '',
@@ -79,7 +91,7 @@ angular.module('passwordmaker', [])
       }
     });
 
-    if (algo === undefined) {
+    if (!h.supports(algo)) {
       deferred.reject('Unknown algorithm: ' + profile.hashAlgorithm);
     } else if (chars === undefined || chars.length < 2) {
       deferred.reject('Invalid character set: ' + chars);
@@ -87,10 +99,10 @@ angular.module('passwordmaker', [])
       deferred.reject('Invalid password length: ' + pLength);
     } else {
       pLength = pLength - mandatory.length;
-      var pass = hash(algo, masterPassword, data, chars, pLength);
-      angular.forEach(mandatory, function(characters) {
-        var i = parseInt(hash(algo, masterPassword, data, '0123456789', pLength.toString().length), '10') % pLength;
-        var c = hash(algo, masterPassword, data, characters + characters, 1);
+      var pass = h.generate(algo, masterPassword, data, chars, pLength);
+      angular.forEach(mandatory, function(characters, indexKey) {
+        var i = parseInt(h.generate(algo, masterPassword + indexKey, data, '0123456789', pLength.toString().length), '10') % pLength;
+        var c = h.generate(algo, masterPassword + indexKey, data, characters + characters, 1);
         pass = [pass.slice(0, i), c, pass.slice(i)].join('');
       });
       deferred.resolve(pass);

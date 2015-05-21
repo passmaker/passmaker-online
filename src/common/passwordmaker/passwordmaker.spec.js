@@ -1,16 +1,15 @@
-describe('pMaker', function() {
+describe('hash service', function() {
 
-  var pMaker, $rootScope;
+  var h, runs;
 
   beforeEach(module('passwordmaker'));
 
-  beforeEach(inject(function(_pMaker_, _$rootScope_) {
-    pMaker = _pMaker_;
-    $rootScope = _$rootScope_;
+  beforeEach(inject(function(_h_) {
+    h = _h_;
   }));
 
-  it('should knows 10 hash algorithms', function() {
-    var algorithms = pMaker.supportedAlgorithms();
+  it('should know 10 hash algorithms', function() {
+    var algorithms = h.supportedAlgorithms();
     expect(algorithms.length).toEqual(10);
     expect(algorithms).toContain('md5');
     expect(algorithms).toContain('sha1');
@@ -23,6 +22,61 @@ describe('pMaker', function() {
     expect(algorithms).toContain('hmac-sha512');
     expect(algorithms).toContain('hmac-rmd160');
   });
+
+  runs = [ 'md5', 'sha1', 'sha256', 'sha512', 'rmd160', 'md5', 'hmac-sha1', 'hmac-sha256', 'hmac-sha512', 'hmac-rmd160' ];
+  runs.forEach(function(algo) {
+    it('should support algorithm ' + algo, function() {
+      expect(h.supports(algo)).toBeTruthy();
+    });
+  });
+
+  it('should return false when asking for an unsupported algorithm', function() {
+    expect(h.supports('sha1024')).toBeFalsy();
+  });
+
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()_-+={}|[]\\:";\'<>?,./';
+  runs = [
+    { algo: 'md5'         , result: 'ERg%+3zR\'],WM,*oF\'\'r' },
+    { algo: 'md5'         , result: 'ERg%+3zR\'],WM,*oF\'\'rGLE8~N-z]qb0&s2(?$!]' },
+    { algo: 'sha1'        , result: 'E~a=*>Et85(|>CAVTwev' },
+    { algo: 'sha1'        , result: 'E~a=*>Et85(|>CAVTwevX1pyqC[j\\KtPF#2_ks5/' },
+    { algo: 'sha256'      , result: ')9tj$5D&T.]Ur9?I+kzK' },
+    { algo: 'sha256'      , result: ')9tj$5D&T.]Ur9?I+kzKh=kB!AZ??<Bsb+qCL`[B' },
+    { algo: 'sha512'      , result: '%&Xu:5y-17-+~yYuUTen' },
+    { algo: 'sha512'      , result: '%&Xu:5y-17-+~yYuUTenE]zfnt]gX@D`l!2hIIO9`kL\'$B48C?' },
+    { algo: 'rmd160'      , result: 'mF:Ckd<5u8IL|uKYG"dC' },
+    { algo: 'rmd160'      , result: 'mF:Ckd<5u8IL|uKYG"dCuIoTGKQm;zVNp~VMv72.' },
+    { algo: 'hmac-md5'    , result: 'IHZhIA8%G{<2+6y;u<Be' },
+    { algo: 'hmac-md5'    , result: 'IHZhIA8%G{<2+6y;u<BeJWueXn!N(lP?Z~c?T4&eIv"jiF&cu4' },
+    { algo: 'hmac-sha1'   , result: 'C}vt@G=\\drvN}!EZma/z' },
+    { algo: 'hmac-sha1'   , result: 'C}vt@G=\\drvN}!EZma/zKv,U:D%1Sb!3/fR]m~nK&Z,/l_F7h$' },
+    { algo: 'hmac-sha256' , result: ']9ui,dd"?Sv:LO:9nMK,' },
+    { algo: 'hmac-sha256' , result: ']9ui,dd"?Sv:LO:9nMK,e#3Py1\\KZvt%t8y^P<CiH<),\\a>q9"' },
+    { algo: 'hmac-sha256' , result: ']9ui,dd"?Sv:LO:9nMK,e#3Py1\\KZvt%t8y^P<CiH<),\\a>q9"$$\\;H{S00_+x^c$*nY1hhlg/aOx<nJFEwL1v;i@U2anTU9wKb2Q{DP$+_dQ\\R2?Fj0/BC+<HF}O7}Ef`pT=N)-YSf&' },
+    { algo: 'hmac-sha512' , result: 'GSVCw5o#0D((OQxv@K~R' },
+    { algo: 'hmac-sha512' , result: 'GSVCw5o#0D((OQxv@K~R@&p99Tin7<<_zf<o+g)!5#K}op9a/\\' },
+    { algo: 'hmac-rmd160' , result: 'DOI.5s<XwPg|t>W\\XUT[' },
+    { algo: 'hmac-rmd160' , result: 'DOI.5s<XwPg|t>W\\XUT[L.9yeEF?kX^WJu,;;@F{=D_];Hskfx' }
+  ];
+
+  runs.forEach(function(test) {
+    it('should return ' + test.result + ' when generating a ' + test.algo + ' hash', function() {
+      var hash = h.generate(test.algo, 'secret', 'github.com' + 'bertrand', chars, test.result.length);
+      expect(hash).toBe(test.result);
+    });
+  });
+});
+
+describe('pMaker', function() {
+
+  var pMaker, $rootScope;
+
+  beforeEach(module('passwordmaker'));
+
+  beforeEach(inject(function(_pMaker_, _$rootScope_) {
+    pMaker = _pMaker_;
+    $rootScope = _$rootScope_;
+  }));
 
   it('can generate bertrand\'s password', function() {
     var profile = {

@@ -29,8 +29,12 @@ cd $workdir/$repo
 git checkout -B $target_branch
 
 echo === Removing obsolete deployments
+curl -s https://api.github.com/rate_limit
 active_branches=$(curl -s https://api.github.com/repos/passmaker/passmaker-online/branches | jq -r '.[].name')
-current_deployments=$(find . -mindepth 2 ! -path './pull-request/*' -type f -name '.deployment' -exec dirname {} \+ | sed 's/\.\///g')
+current_deployments=$(find . -mindepth 2 ! -path './pull-request/*' -type f -name '.deployment' -exec dirname "{}" \; | sed 's/^\.\///g')
+
+echo ACT_BRANCHES=$active_branches
+echo CURR_DEPLOYMENTS=$current_deployments
 
 for deployment in $(comm -13 <(echo "$active_branches") <(echo "$current_deployments")) ; do
   echo "<<< Undeploy $deployment"
@@ -38,7 +42,7 @@ for deployment in $(comm -13 <(echo "$active_branches") <(echo "$current_deploym
   git commit -m "Undeploy $deployment"
 done
 
-for prdeployment in $(find . -maxdepth 3 -path './pull-request/*' -type f -name '.deployment' -exec dirname {} \+ | sed 's/\.\///g') ; do
+for prdeployment in $(find . -maxdepth 3 -path './pull-request/*' -type f -name '.deployment' -exec dirname "{}" \; | sed 's/^\.\///g') ; do
   id=$(basename $prdeployment)
   state=$(curl -s https://api.github.com/repos/passmaker/passmaker-online/pulls/$id | jq -r '.state')
   if [ "X$state" != "Xopen" ] ; then

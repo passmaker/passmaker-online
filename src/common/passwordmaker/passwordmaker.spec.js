@@ -149,14 +149,61 @@ describe('pMaker', function() {
     expect(result.password).toEqual('2gSc#fq;R&(]:6|h+>q@ShI)Ju9l`p.$v<o#{~Oh}f$/Z|Je9CVH8ug/9FtC');
   });
 
-  it('generates a password containing the letter "A" when a constraint "1 of A" is set', function() {
-    var profile = {
-      hashAlgorithm: 'hmac-sha256',
-      passwordLength: 6,
-      characters: '0123456789',
-      constraints: [ { amount: 1, characters: 'A' } ]
-    };
-    var result = generatePassword(profile, 'secret', 'github.com', 'bertrand');
-    expect(result.password).toContain('A');
+  describe('constraints', function() {
+
+    it('generates a password containing the letter "A" when a constraint 1 of A"" is set', function() {
+      var profile = {
+        hashAlgorithm: 'hmac-sha256',
+        passwordLength: 6,
+        characters: '0123456789',
+        constraints: [ { amount: 1, characters: 'A' } ]
+      };
+      var result = generatePassword(profile, 'secret', 'github.com', 'bertrand');
+      expect(result.password).toContain('A');
+    });
+
+    it('generates a password containing a letter when a constraint "1 letter" is set', function() {
+      var profile = {
+        hashAlgorithm: 'hmac-sha256',
+        passwordLength: 6,
+        characters: '0123456789',
+        constraints: [ { amount: 1, characters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' } ]
+      };
+      var result = generatePassword(profile, 'secret', 'github.com', 'bertrand');
+      expect(result.password).toMatch(/[a-zA-Z]/);
+    });
+
+    it('generates a password containing a lowercase letter a constraint "1 lowercase letter" is set', function() {
+      var profile = {
+        hashAlgorithm: 'hmac-sha256',
+        passwordLength: 6,
+        characters: '0123456789',
+        constraints: [ { amount: 1, characters: 'abcdefghijklmnopqrstuvwxyz' } ]
+      };
+      var result = generatePassword(profile, 'secret', 'github.com', 'bertrand');
+      expect(result.password).toMatch(/[a-z]/);
+    });
+
+    it('generates a password containing an uppercase letter a constraint "1 uppercase letter" is set', function() {
+      var profile = {
+        hashAlgorithm: 'hmac-sha256',
+        passwordLength: 6,
+        characters: '0123456789',
+        constraints: [ { amount: 1, characters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' } ]
+      };
+      var result = generatePassword(profile, 'secret', 'github.com', 'bertrand');
+      expect(result.password).toMatch(/[A-Z]/);
+    });
+
+    it('generates a password containing a digit a constraint "1 digit" is set', function() {
+      var profile = {
+        hashAlgorithm: 'hmac-sha256',
+        passwordLength: 6,
+        characters: '0123456789',
+        constraints: [ { amount: 1, characters: '0123456789' } ]
+      };
+      var result = generatePassword(profile, 'secret', 'github.com', 'bertrand');
+      expect(result.password).toMatch(/[0-9]/);
+    });
   });
 });

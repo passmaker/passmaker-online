@@ -3,6 +3,7 @@ angular.module( 'passmaker', [
   'templates-common',
   'ui.router',
   'ui.bootstrap.collapse',
+  'ngTagsInput',
   // internal deps
   'google.api',
   'passwordmaker',
@@ -17,6 +18,13 @@ angular.module( 'passmaker', [
   scopes: [
     'https://www.googleapis.com/auth/drive.file'
   ]
+})
+
+.constant('defaultCharacterSets', {
+  'digit': '0123456789',
+  'letter': 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  'lowercase letter': 'abcdefghijklmnopqrstuvwxyz',
+  'uppercase letter': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 })
 
 .config(function($urlRouterProvider) {
@@ -127,16 +135,23 @@ angular.module( 'passmaker', [
   };
 })
 
-.service('profileManager', function (profile) {
+.service('profileManager', function (profile, defaultCharacterSets) {
   this.getProfile = function(inputText) {
     var p = {
       custom: false,
       hashAlgorithm: profile.hashAlgorithm,
       characters: profile.characters,
-      passwordLength: profile.passwordLength
+      passwordLength: profile.passwordLength,
+      constraints: []
     };
     angular.forEach(profile.exceptions, function(exception) {
-      if (inputText && inputText == exception.service) {
+      var matches = false;
+      angular.forEach(exception.patterns, function(pattern) {
+        if (new RegExp('^' + pattern.text + '$', 'i').test(inputText)) {
+          matches = true;
+        }
+      });
+      if (matches) {
         p.custom = true;
         if (exception.passwordLength.override === true) {
           p.passwordLength = exception.passwordLength.value;
@@ -144,9 +159,11 @@ angular.module( 'passmaker', [
         if (exception.modifier.override === true) {
           p.modifier = exception.modifier.value;
         }
-        if (exception.characters.override === true) {
-          p.characters = exception.characters.value;
-        }
+        angular.forEach(exception.constraints, function(constraint) {
+          var c = /^(\d+) (.+)$/.exec(constraint.text);
+          var chars = defaultCharacterSets[c[2]] || c[2];
+          p.constraints.push({ 'amount': parseInt(c[1], 10), 'characters': chars });
+        });
       }
     });
     return p;

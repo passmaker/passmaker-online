@@ -13,7 +13,7 @@ angular.module('passmaker.configuration', [
   });
 })
 
-.controller('ConfigurationCtrl', function($scope, profile, pMaker, passMakerConf, $modal) {
+.controller('ConfigurationCtrl', function($scope, profile, pMaker, passMakerConf, $modal, $q) {
 
   $scope.hashAlgorithms = pMaker.supportedAlgorithms();
 
@@ -22,15 +22,33 @@ angular.module('passmaker.configuration', [
   $scope.addException = function() {
     $scope.profile.exceptions = $scope.profile.exceptions || [];
     $scope.profile.exceptions.push({
-      'service': 'New service name',
+      'patterns': [],
       'passwordLength': { 'override': false, 'value': '' },
       'modifier': { 'override': false, 'value': '' },
-      'characters': { 'override': false, 'value': '' }
+      'constraints': []
     });
   };
 
   $scope.removeException = function(i) {
     $scope.profile.exceptions.splice(i, 1);
+  };
+
+  $scope.suggestConstraints = function(query) {
+    var characterSets = [
+      'digit', 'letter', 'lowercase letter', 'uppercase letter', 'of ,.-!'
+    ];
+    var tags = [];
+    var qryStruct = /^(?:(\d+)(?:\s(.*))?)|(?:.*)$/i.exec(query);
+    var inputAmount = qryStruct[1] || '1';
+    var inputCharacterSet = qryStruct[2] || '';
+    angular.forEach(characterSets, function(characterSet) {
+      if (characterSet.indexOf(inputCharacterSet) > -1) {
+        tags.push(inputAmount + ' ' + characterSet);
+      }
+    });
+    var deferred = $q.defer();
+    deferred.resolve(tags);
+    return deferred.promise;
   };
 
   $scope.restoreConfiguration = function() {
@@ -47,29 +65,6 @@ angular.module('passmaker.configuration', [
 
   $scope.saveConfiguration = function() {
     passMakerConf.save();
-  };
-})
-
-.service('profileManager', function(profile) {
-  this.getProfile = function(inputText) {
-    var p = {
-      custom: false,
-      hashAlgorithm: profile.hashAlgorithm,
-      characters: profile.characters,
-      passwordLength: profile.passwordLength
-    };
-    angular.forEach(profile.exceptions, function(exception) {
-      if (inputText && inputText == exception.service) {
-        p.custom = true;
-        if (exception.passwordLength.override === true) {
-          p.passwordLength = exception.passwordLength.value;
-        }
-        if (exception.modifier.override === true) {
-          p.modifier = exception.modifier.value;
-        }
-      }
-    });
-    return p;
   };
 })
 

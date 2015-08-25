@@ -1,5 +1,7 @@
-# run on travis docker infrastructure
 sudo: false
+env:
+  global:
+    secure: CVxKUE9U5U8sn3EYOy4JPp045bjZivuFPG5cjz3Ozdbad9sCaGpeZdqkVour9MqRADSl+JSTU9FKHHeJu9m8i2/z+HOygkimRq00y+CKYJ4MDLsddd/fyJuS8OEMVg/QfR4nLYuCPy7sU3Kuq3BRKRXLr4JzfevCTAKQG+1+0Tg=
 
 language: node_js
 node_js:

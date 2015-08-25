@@ -16,7 +16,7 @@ ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 if [ "X$TRAVIS_PULL_REQUEST" != "Xfalse" ] ; then
   ./deploy/deploy_to_repository.sh dev gh-pages pull-request/$TRAVIS_PULL_REQUEST
-elif [ "X$TRAVIS_BRANCH" != "Xproduction" ] ;then
+elif [ "X$TRAVIS_BRANCH" != "Xmaster" ] ;then
   ./deploy/deploy_to_repository.sh dev gh-pages $TRAVIS_BRANCH
 else
   ./deploy/deploy_to_repository.sh passmaker.github.io master .

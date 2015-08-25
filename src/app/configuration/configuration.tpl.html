@@ -48,10 +48,10 @@
     <ul class="list-group">
       <li class="list-group-item" ng-repeat="exception in profile.exceptions">
         <div class="form-group">
-          <label for="exception-{{ $index }}" class="col-sm-3 control-label">Service</label>
+          <label for="exception-{{ $index }}" class="col-sm-3 control-label">Input text patterns</label>
           <div class="col-sm-9">
             <div class="input-group">
-              <input id="exception-{{ $index }}" type="text" class="form-control" ng-model="exception.service" />
+              <tags-input id="exception-{{ $index }}" ng-model="exception.patterns" placeholder="*.google.com" add-on-blur="false" allow-leftover-text="false" replace-spaces-with-dashes="false"></tags-input>
               <span class="input-group-btn">
                 <button class="btn btn-danger" type="button" ng-click="removeException($index)">Remove</button>
               </span>
@@ -81,14 +81,11 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="characters-{{ $index }}" class="col-sm-3 control-label">Characters</label>
+          <label for="constraints-{{ $index }}" class="col-sm-3 control-label">Constraints</label>
           <div class="col-sm-9">
-            <div class="input-group">
-              <span class="input-group-addon">
-                <input type="checkbox" ng-model="exception.characters.override">
-              </span>
-              <input id="characters-{{ $index }}" type="text" class="form-control" ng-model="exception.characters.value" ng-disabled="!exception.characters.override" />
-            </div>
+            <tags-input id="constraints-{{ $index }}" ng-model="exception.constraints" placeholder="1 uppercase letter" add-on-blur="false" allow-leftover-text="false" replace-spaces-with-dashes="false">
+              <auto-complete source="suggestConstraints($query)" min-length="1" load-on-down-arrow="true" load-on-focus="true"></auto-complete>
+            </tags-input>
           </div>
         </div>
       </li>

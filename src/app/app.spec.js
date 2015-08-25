@@ -8,9 +8,8 @@ describe('profileManager', function() {
 
   beforeEach(function() {
     exception = {
-      service: 'exception-website.com',
+      patterns: [ { text: 'exception-.*.com' } ],
       passwordLength: { override: false },
-      characters:     { override: false },
       modifier:       { override: false }
     };
   });
@@ -20,7 +19,8 @@ describe('profileManager', function() {
       hashAlgorithm:  'default-hash',
       characters:     'default-characters',
       passwordLength: 6,
-      exceptions: [ exception ]
+      exceptions: [ exception ],
+      constraints: []
     };
     module(function($provide) {
       $provide.value('profile', mockProfile);
@@ -38,7 +38,8 @@ describe('profileManager', function() {
       hashAlgorithm: 'default-hash',
       passwordLength: 6,
       characters: 'default-characters',
-      modifier: undefined
+      modifier: undefined,
+      constraints: []
     });
   }));
 
@@ -52,7 +53,8 @@ describe('profileManager', function() {
       hashAlgorithm: 'default-hash',
       passwordLength: 5,
       characters: 'default-characters',
-      modifier: undefined
+      modifier: undefined,
+      constraints: []
     });
   }));
 
@@ -66,12 +68,15 @@ describe('profileManager', function() {
       hashAlgorithm: 'default-hash',
       passwordLength: 6,
       characters: 'default-characters',
-      modifier: 'alt'
+      modifier: 'alt',
+      constraints: []
     });
   }));
 
-  it('should return custom profile when character set is overrided', inject(function() {
-    exception.characters = { override: true, value: 'custom-characters' };
+  it('should return custom profile when a constraint is set', inject(function() {
+    exception.constraints = [
+      { text: '1 digit' }
+    ];
 
     var p = profileManager.getProfile('exception-website.com');
 
@@ -79,8 +84,9 @@ describe('profileManager', function() {
       custom: true,
       hashAlgorithm: 'default-hash',
       passwordLength: 6,
-      characters: 'custom-characters',
-      modifier: undefined
+      characters: 'default-characters',
+      modifier: undefined,
+      constraints: [ { amount: 1, characters: '0123456789' } ]
     });
   }));
 

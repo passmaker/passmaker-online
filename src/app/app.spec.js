@@ -90,4 +90,17 @@ describe('profileManager', function() {
     });
   }));
 
+  it('should ignore "of " when it parses custom contraint', inject(function() {
+    exception.constraints = [
+      { text: '1 of a2!_' }
+    ];
+
+    var p = profileManager.getProfile('exception-website.com');
+
+    expect(p.constraints).toContain({
+      amount: 1,
+      characters: 'a2!_'
+    });
+  }));
+
 });

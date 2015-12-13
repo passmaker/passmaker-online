@@ -160,7 +160,7 @@ angular.module( 'passmaker', [
           p.modifier = exception.modifier.value;
         }
         angular.forEach(exception.constraints, function(constraint) {
-          var c = /^(\d+) (.+)$/.exec(constraint.text);
+          var c = /^(\d+)(?: of)? (.+)$/.exec(constraint.text);
           var chars = defaultCharacterSets[c[2]] || c[2];
           p.constraints.push({ 'amount': parseInt(c[1], 10), 'characters': chars });
         });
